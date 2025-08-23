@@ -1,11 +1,13 @@
 import { createContext, useState, ReactNode, useEffect } from 'react';
 import { useGoogleLogin, CodeResponse } from '@react-oauth/google';
 import axios from 'axios';
+import { mockLogin, MockLoginRequest, MockLoginResponse } from '../helpers/Api';
 
 // Define a type for the user state
 type User = {
   token: string;
   userData?: Record<string, unknown>; // More specific than 'any'
+  tenantId?: string; // Add tenant ID support
 } | null;
 
 // Define a type for the context
@@ -13,6 +15,7 @@ export interface AuthContextType {
   user: User;
   googleLogin: () => void;
   directGoogleLogin: () => void;
+  mockLogin: (credentials: MockLoginRequest) => Promise<boolean>;
   logout: () => void;
   profile: GoogleProfile | null;
   isLoading: boolean;
@@ -42,6 +45,42 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [profile, setProfile] = useState<GoogleProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Mock login function
+  const handleMockLogin = async (credentials: MockLoginRequest): Promise<boolean> => {
+    console.log('AuthContext: Starting mock login with credentials:', credentials);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const [success, response] = await mockLogin(credentials);
+      console.log('AuthContext: Mock login result:', { success, response });
+      
+      if (success && response) {
+        const userData = {
+          token: response.token,
+          userData: response.user,
+          tenantId: response.user.tenantId
+        };
+        
+        console.log('AuthContext: Setting user data:', userData);
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+        setIsLoading(false);
+        return true;
+      } else {
+        console.log('AuthContext: Login failed - invalid response');
+        setError('Invalid credentials. Please try again.');
+        setIsLoading(false);
+        return false;
+      }
+    } catch (err) {
+      console.error('AuthContext: Mock login error:', err);
+      setError('Login failed. Please try again.');
+      setIsLoading(false);
+      return false;
+    }
+  };
 
   // Fallback login for direct Google OAuth when backend is not available
   const directGoogleLogin = useGoogleLogin({
@@ -165,7 +204,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem('user');
   };
 
-  const value = { user, googleLogin, directGoogleLogin, logout, profile, isLoading, error };
+  const value = { 
+    user, 
+    googleLogin, 
+    directGoogleLogin, 
+    mockLogin: handleMockLogin,
+    logout, 
+    profile, 
+    isLoading, 
+    error 
+  };
 
   return (
     <AuthContext.Provider value={value}>

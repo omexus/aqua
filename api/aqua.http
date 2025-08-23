@@ -1,5 +1,5 @@
 # @aqua_api_HostAddress = https://localhost:5001/api/statements
-@aqua_api_HostAddress = http://localhost:5000/api/statements
+@aqua_api_HostAddress = http://localhost:5001/api/statements
 
 GET {{aqua_api_HostAddress}}/statements/a2f02fa1-bbe4-46f8-90be-4aa43162400c
 Accept: application/json

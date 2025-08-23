@@ -78,7 +78,8 @@ public class Startup
                 .AddScoped<IS3Service, S3Service>()
                 .AddScoped(typeof(IRepository<Condo>), typeof(CondoRepository))
                 .AddScoped(typeof(IRepository<Period>), typeof(GenericRepository<Period>))
-                .AddScoped<EmailSenderService>();
+                .AddScoped<EmailSenderService>()
+                .AddScoped<DataSeeder>();
 
         services.AddAWSService<IAmazonCognitoIdentityProvider>();
 

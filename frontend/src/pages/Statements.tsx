@@ -101,7 +101,7 @@ export function Statements() {
       })
       .catch((error) => console.error(error))
       .finally(() => {handlers.close(); setFilesUploaded(false)});
-  }, [periodId, filesUploaded, handlers]);
+  }, [periodId, filesUploaded]);
 
   const rows = data?.statements?.map((row) => {
     return (

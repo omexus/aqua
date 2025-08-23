@@ -90,6 +90,6 @@ aqua-workspace/
 - Make sure Docker Desktop is running before using `npm run setup`
 - The API is configured to use DynamoDB Local for development
 - Environment variables need to be configured for production deployment
-- The frontend expects the API to be running on `http://localhost:5000`
+- The frontend expects the API to be running on `http://localhost:5001`
 
 Your monorepo is now ready for development! 🚀

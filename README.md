@@ -42,7 +42,7 @@ aqua-workspace/
 
 3. **Access the applications:**
    - **Frontend:** http://localhost:5173
-   - **API:** http://localhost:5000
+   - **API:** http://localhost:5001
    - **DynamoDB Local:** http://localhost:8000
 
 ## 🛠️ Development
@@ -108,7 +108,7 @@ Create `.env` files in the respective directories:
 
 **Frontend (`frontend/.env`):**
 ```env
-VITE_API_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5001
 VITE_GOOGLE_CLIENT_ID=your-google-client-id
 ```
 

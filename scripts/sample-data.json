@@ -1,0 +1,71 @@
+{
+  "condo": {
+    "id": "a2f02fa1-bbe4-46f8-90be-4aa43162400c",
+    "name": "Aqua Condominium",
+    "prefix": "AQUA"
+  },
+  "units": [
+    {
+      "id": "unit-101",
+      "userId": "user1",
+      "prefix": "AQUA",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "unit": "101",
+      "role": "Owner"
+    },
+    {
+      "id": "unit-102",
+      "userId": "user2",
+      "prefix": "AQUA",
+      "name": "Jane Smith",
+      "email": "jane.smith@example.com",
+      "unit": "102",
+      "role": "Tenant"
+    },
+    {
+      "id": "unit-201",
+      "userId": "user3",
+      "prefix": "AQUA",
+      "name": "Bob Johnson",
+      "email": "bob.johnson@example.com",
+      "unit": "201",
+      "role": "Owner"
+    },
+    {
+      "id": "unit-202",
+      "userId": "user4",
+      "prefix": "AQUA",
+      "name": "Alice Brown",
+      "email": "alice.brown@example.com",
+      "unit": "202",
+      "role": "Tenant"
+    }
+  ],
+  "periods": [
+    {
+      "id": "period-jan",
+      "from": "2024-01-01",
+      "to": "2024-01-31",
+      "prefix": "AQUA",
+      "generated": 0,
+      "amount": 1500.00
+    },
+    {
+      "id": "period-feb",
+      "from": "2024-02-01",
+      "to": "2024-02-29",
+      "prefix": "AQUA",
+      "generated": 0,
+      "amount": 1500.00
+    },
+    {
+      "id": "period-mar",
+      "from": "2024-03-01",
+      "to": "2024-03-31",
+      "prefix": "AQUA",
+      "generated": 0,
+      "amount": 1500.00
+    }
+  ]
+}

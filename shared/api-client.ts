@@ -6,7 +6,7 @@ export class ApiClient {
   private client: AxiosInstance;
   private baseURL: string;
 
-  constructor(baseURL: string = process.env.VITE_API_URL || 'http://localhost:5000') {
+  constructor(baseURL: string = process.env.VITE_API_URL || 'http://localhost:5001') {
     this.baseURL = baseURL;
     this.client = axios.create({
       baseURL: this.baseURL,

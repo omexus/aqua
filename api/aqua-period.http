@@ -1,5 +1,4 @@
 @aqua_api_HostAddress = https://localhost:5001/api/periods
-# @aqua_api_HostAddress = http://localhost:5000/api/periods
 
 GET {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c/20240101/statements
 Accept: application/json

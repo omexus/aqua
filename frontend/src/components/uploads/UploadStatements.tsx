@@ -77,7 +77,7 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded }
     const units = getMappedUnits(files, unitsInDb);
     setMappedUnits(units);
     uploadForm.setFieldValue("files", units);
-  }, [files, unitsInDb, uploadForm]);
+  }, [files, unitsInDb]);
 
   const selectedFiles = uploadForm.getValues().files.map((file, index) => (
     <Table.Tr key={`${file.name}${index}`}>

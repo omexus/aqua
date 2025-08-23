@@ -58,7 +58,7 @@ const Periods: React.FC<Props> = () => {
       .then(([, data]) => setData(data))
       .catch((error) => console.error(error))
       .finally(close);
-  }, [open, close]);
+  }, []);
 
   const onNewPeriod = (period: PeriodResponse) => {
     console.log("Periods.onNewPeriod", period);
@@ -91,7 +91,7 @@ const Periods: React.FC<Props> = () => {
       >
         <div style={{ height: '100%', padding: '0 20px' }}>
           <NewPeriod 
-            id={condoId || ""} 
+            id={condoId || "1"} 
             actionOnCancel={closeModal}
             actionOnConfirm={onNewPeriod}
           />
