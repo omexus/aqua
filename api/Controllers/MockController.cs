@@ -284,11 +284,117 @@ namespace aqua.api.Controllers
 
             return Ok(period);
         }
+
+        // Mock user provisioning endpoints
+        [HttpPost("users/provision")]
+        public ActionResult<object> ProvisionUser([FromBody] MockUserProvisionRequest request)
+        {
+            // Check if user already exists
+            if (UserTenantMapping.ContainsKey(request.Email))
+            {
+                var existingTenantId = UserTenantMapping[request.Email];
+                var existingCondo = Condos[existingTenantId];
+                
+                return Ok(new
+                {
+                    success = true,
+                    user = new
+                    {
+                        id = Guid.NewGuid().ToString(),
+                        userId = request.GoogleUserId,
+                        name = request.Name,
+                        email = request.Email,
+                        unit = request.Unit,
+                        role = request.Role,
+                        condoId = existingTenantId,
+                        condoName = existingCondo.Name,
+                        condoPrefix = existingCondo.Prefix
+                    },
+                    error = "User already exists"
+                });
+            }
+
+            // Validate condo exists
+            if (!Condos.ContainsKey(request.CondoId))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    error = "Condo not found"
+                });
+            }
+
+            var condo = Condos[request.CondoId];
+            
+            // Add user to tenant mapping
+            UserTenantMapping[request.Email] = request.CondoId;
+
+            return Ok(new
+            {
+                success = true,
+                user = new
+                {
+                    id = Guid.NewGuid().ToString(),
+                    userId = request.GoogleUserId,
+                    name = request.Name,
+                    email = request.Email,
+                    unit = request.Unit,
+                    role = request.Role,
+                    condoId = request.CondoId,
+                    condoName = condo.Name,
+                    condoPrefix = condo.Prefix
+                }
+            });
+        }
+
+        [HttpGet("users/me")]
+        public ActionResult<object> GetCurrentUserProfile([FromHeader(Name = "Authorization")] string authHeader)
+        {
+            // For mock purposes, return a default user
+            var defaultEmail = "john.doe@aqua.com";
+            var tenantId = UserTenantMapping[defaultEmail];
+            var condo = Condos[tenantId];
+
+            return Ok(new
+            {
+                id = Guid.NewGuid().ToString(),
+                userId = "mock-google-user-id",
+                name = "John Doe",
+                email = defaultEmail,
+                unit = "101",
+                role = "Owner",
+                condoId = tenantId,
+                condoName = condo.Name,
+                condoPrefix = condo.Prefix
+            });
+        }
+
+        [HttpGet("users/condos")]
+        public ActionResult<List<CondoDto>> GetAvailableCondos()
+        {
+            return Ok(Condos.Values.ToList());
+        }
+
+        [HttpGet("users/test")]
+        public ActionResult<string> TestUserEndpoint()
+        {
+            return Ok("User endpoints are working!");
+        }
     }
 
     public class MockLoginRequest
     {
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class MockUserProvisionRequest
+    {
+        public string GoogleUserId { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string CondoId { get; set; } = string.Empty;
+        public string Unit { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
     }
 }

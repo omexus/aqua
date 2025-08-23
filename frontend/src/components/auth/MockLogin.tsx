@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, TextInput, Stack, Text, Paper, Select, Alert } from '@mantine/core';
+import { Button, Stack, Text, Paper, Select, Alert } from '@mantine/core';
 import { useAuth } from '../../hooks/useAuth';
 
 // Predefined test users for different tenants
@@ -48,16 +48,16 @@ export const MockLogin: React.FC = () => {
     <Paper p="md" withBorder style={{ maxWidth: 400, margin: '0 auto' }}>
       <Stack gap="md">
         <Text size="xl" fw={700} ta="center">
-          🧪 Mock Login
+          🔐 Sign Up / Login
         </Text>
         
         <Text size="sm" c="dimmed" ta="center">
-          Test the multi-tenant functionality with different user accounts
+          Choose your condo and sign up for HOA management access
         </Text>
 
         <Select
-          label="Select Test User"
-          placeholder="Choose a user to login as..."
+          label="Select Your Condo & User"
+          placeholder="Choose your condo and user account..."
           data={TEST_USERS}
           value={selectedUser}
           onChange={(value) => {
@@ -94,12 +94,11 @@ export const MockLogin: React.FC = () => {
           disabled={!selectedUser}
           fullWidth
         >
-          {isLoading ? 'Logging in...' : 'Login with Mock User'}
+          {isLoading ? 'Signing up...' : 'Sign Up / Login'}
         </Button>
 
         <Text size="xs" c="dimmed" ta="center">
-          This is a development feature for testing multi-tenant functionality.
-          In production, users would authenticate through Google OAuth.
+          This simulates the signup/login process. After authentication, you'll be prompted to complete your profile with your condo details.
         </Text>
       </Stack>
     </Paper>

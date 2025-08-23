@@ -53,4 +53,37 @@ public class JwtTokenGenerator
         // Return the serialized token (JWT string)
         return tokenHandler.WriteToken(token);
     }
+
+    // Static method for generating tokens with Google user info
+    public static string GenerateToken(string userId, string email, string name)
+    {
+        var secretKey = "yGOCSPX-CMx2JjjfJx_ztxQFeETBAlO1R4Cy";// "your-super-secret-key-with-at-least-32-characters";
+        var issuer = "aqua-api";
+        var audience = "aqua-frontend";
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(secretKey);
+
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, userId),
+            new Claim(JwtRegisteredClaimNames.Email, email),
+            new Claim(JwtRegisteredClaimNames.Name, name),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        };
+
+        var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddHours(24), // 24 hours for development
+            Issuer = issuer,
+            Audience = audience,
+            SigningCredentials = credentials
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
 }

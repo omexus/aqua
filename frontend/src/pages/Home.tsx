@@ -1,18 +1,32 @@
-import { AppShell, Burger, Group, Button, Modal, Stack } from '@mantine/core';
+import { AppShell, Burger, Group, Button, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useState } from 'react';
+import { useEffect } from 'react';
 // import { AppHeader } from '../components/Header';
 import PageNav from '../components/PageNav';
 import { Outlet } from 'react-router-dom';
 import { MantineLogo } from '@mantinex/mantine-logo';
 import { MockLogin } from '../components/auth/MockLogin';
-import { ApiTest } from '../components/auth/ApiTest';
+import { UserProvision } from '../components/auth/UserProvision';
+import { GoogleSignUp } from '../components/auth/GoogleSignUp';
 import { useAuth } from '../hooks/useAuth';
 
 export function Home() {
   const [opened, { toggle }] = useDisclosure();
   const [mockLoginOpened, { open: openMockLogin, close: closeMockLogin }] = useDisclosure();
-  const { user, logout } = useAuth();
+  const [googleSignUpOpened, { open: openGoogleSignUp, close: closeGoogleSignUp }] = useDisclosure();
+  const [userProvisionOpened, { open: openUserProvision, close: closeUserProvision }] = useDisclosure();
+  const { user, logout, isUserProvisioned, checkUserProvisioning } = useAuth();
+
+  // Check user provisioning when user logs in
+  useEffect(() => {
+    if (user && !isUserProvisioned) {
+      checkUserProvisioning().then((provisioned) => {
+        if (!provisioned) {
+          openUserProvision();
+        }
+      });
+    }
+  }, [user, isUserProvisioned, checkUserProvisioning, openUserProvision]);
 
   return (
     <AppShell
@@ -36,10 +50,17 @@ export function Home() {
                 size="sm" 
                 onClick={logout}
               >
-                Logout ({user.userData?.email || 'User'})
+                Logout ({(user.userData?.email as string) || 'User'})
               </Button>
             ) : (
               <>
+                <Button 
+                  variant="filled" 
+                  size="sm" 
+                  onClick={openGoogleSignUp}
+                >
+                  🔐 Sign Up / Login
+                </Button>
                 <Button 
                   variant="light" 
                   size="sm" 
@@ -71,10 +92,51 @@ export function Home() {
       <Modal 
         opened={mockLoginOpened} 
         onClose={closeMockLogin}
-        title="🧪 Mock Login - Test Multi-Tenant"
+        title="🧪 Mock Login - Multi-Tenant HOA Management"
         size="md"
       >
         <MockLogin />
+      </Modal>
+
+      <Modal 
+        opened={googleSignUpOpened} 
+        onClose={closeGoogleSignUp}
+        title="🔐 Sign Up with Google - Multi-Tenant HOA Management"
+        size="lg"
+      >
+        <GoogleSignUp 
+          onSuccess={(userData) => {
+            console.log('Google signup successful:', userData);
+            closeGoogleSignUp();
+          }}
+          onError={(error) => {
+            console.error('Google signup error:', error);
+          }}
+          onCancel={() => {
+            closeGoogleSignUp();
+          }}
+        />
+      </Modal>
+
+      <Modal 
+        opened={userProvisionOpened} 
+        onClose={closeUserProvision}
+        title="🏠 Complete Your Profile"
+        size="lg"
+        closeOnClickOutside={false}
+        closeOnEscape={false}
+        withCloseButton={false}
+      >
+        <UserProvision 
+          onSuccess={(userData) => {
+            console.log('User provisioned successfully:', userData);
+            closeUserProvision();
+          }}
+          onCancel={() => {
+            logout(); // Logout if user cancels provisioning
+            closeUserProvision();
+          }}
+        />
       </Modal>
     </AppShell>
   );

@@ -1,7 +1,7 @@
 import { createContext, useState, ReactNode, useEffect } from 'react';
 import { useGoogleLogin, CodeResponse } from '@react-oauth/google';
 import axios from 'axios';
-import { mockLogin, MockLoginRequest, MockLoginResponse } from '../helpers/Api';
+import { mockLogin, MockLoginRequest, getCurrentUserProfile } from '../helpers/Api';
 
 // Define a type for the user state
 type User = {
@@ -20,6 +20,8 @@ export interface AuthContextType {
   profile: GoogleProfile | null;
   isLoading: boolean;
   error: string | null;
+  isUserProvisioned: boolean;
+  checkUserProvisioning: () => Promise<boolean>;
 }
 
 // Create the context with a default undefined value
@@ -45,6 +47,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [profile, setProfile] = useState<GoogleProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isUserProvisioned, setIsUserProvisioned] = useState(false);
 
   // Mock login function
   const handleMockLogin = async (credentials: MockLoginRequest): Promise<boolean> => {
@@ -181,6 +184,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.setItem('user', JSON.stringify(userData));
       })
       .catch(error => {
+        console.error('Backend auth failed, using mock authentication for development:', error);
+        
+        // For development, create a mock user when backend fails
+        const mockUserData = {
+          token: 'mock-jwt-token-' + Date.now(),
+          userData: {
+            id: 'mock-google-id',
+            email: 'user@example.com',
+            name: 'Mock Google User',
+            picture: '',
+            googleUserId: 'mock-google-id'
+          }
+        };
+        
+        setUser(mockUserData);
+        localStorage.setItem('user', JSON.stringify(mockUserData));
+      })
+      .catch(error => {
         console.error('Backend auth failed, falling back to direct Google auth:', error);
         
         // Fallback: Use direct Google login
@@ -201,7 +222,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
     setProfile(null);
     setError(null);
+    setIsUserProvisioned(false);
     localStorage.removeItem('user');
+  };
+
+  const checkUserProvisioning = async (): Promise<boolean> => {
+    if (!user?.token) {
+      return false;
+    }
+
+    try {
+      const [success, response] = await getCurrentUserProfile(user.token);
+      if (success && response) {
+        setIsUserProvisioned(true);
+        return true;
+      } else {
+        setIsUserProvisioned(false);
+        return false;
+      }
+    } catch (err) {
+      console.error('Error checking user provisioning:', err);
+      setIsUserProvisioned(false);
+      return false;
+    }
   };
 
   const value = { 
@@ -212,7 +255,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     logout, 
     profile, 
     isLoading, 
-    error 
+    error,
+    isUserProvisioned,
+    checkUserProvisioning
   };
 
   return (

@@ -363,3 +363,161 @@ export const RemoveStatement = async (
     return false;
   }
 };
+
+// Google OAuth authentication
+export interface GoogleAuthRequest {
+  code: string;
+  redirectUri?: string;
+}
+
+export interface GoogleAuthResponse {
+  success: boolean;
+  token?: string;
+  user?: {
+    id: string;
+    userId: string;
+    name: string;
+    email: string;
+    unit: string;
+    role: string;
+    condoId: string;
+    condoName: string;
+    condoPrefix: string;
+  };
+  error?: string;
+}
+
+// Google OAuth authentication function
+export const authenticateWithGoogle = async (
+  request: GoogleAuthRequest
+): Promise<[success: boolean, response: GoogleAuthResponse | null]> => {
+  try {
+    const { data } = await axios.post(
+      `${getApiBaseUrl()}/auth/google`,
+      request
+    );
+
+    if (!data || !data.success) {
+      console.error("Google authentication failed:", data);
+      return [false, null];
+    }
+
+    return [true, data];
+  } catch (err: unknown) {
+    console.error("Error in authenticateWithGoogle", err);
+    if (axios.isAxiosError(err)) {
+      console.error("Axios error details:", {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        url: err.config?.url
+      });
+    }
+    return [false, null];
+  }
+};
+
+// User provisioning types
+export interface UserProvisionRequest {
+  googleUserId: string;
+  name: string;
+  email: string;
+  condoId: string;
+  unit: string;
+  role: string;
+}
+
+export interface UserProvisionResponse {
+  success: boolean;
+  user?: {
+    id: string;
+    userId: string;
+    name: string;
+    email: string;
+    unit: string;
+    role: string;
+    condoId: string;
+    condoName: string;
+    condoPrefix: string;
+  };
+  error?: string;
+}
+
+export interface CondoOption {
+  id: string;
+  name: string;
+  prefix: string;
+}
+
+// User provisioning functions
+export const provisionUser = async (
+  request: UserProvisionRequest
+): Promise<[success: boolean, response: UserProvisionResponse | null]> => {
+  try {
+    const { data } = await axios.post(
+      `${getApiBaseUrl()}/mock/users/provision`,
+      request
+    );
+
+    if (!data || !data.success) {
+      console.error("User provisioning failed:", data);
+      return [false, null];
+    }
+
+    return [true, data];
+  } catch (err: unknown) {
+    console.error("Error in provisionUser", err);
+    if (axios.isAxiosError(err)) {
+      console.error("Axios error details:", {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        url: err.config?.url
+      });
+    }
+    return [false, null];
+  }
+};
+
+export const getCurrentUserProfile = async (
+  token: string
+): Promise<[success: boolean, response: any | null]> => {
+  try {
+    const { data } = await axios.get(
+      `${getApiBaseUrl()}/mock/users/me`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!data) {
+      console.error("No data returned from getCurrentUserProfile endpoint");
+      return [false, null];
+    }
+
+    return [true, data];
+  } catch (err: unknown) {
+    console.error("Error in getCurrentUserProfile", err);
+    return [false, null];
+  }
+};
+
+export const getAvailableCondos = async (): Promise<[success: boolean, response: CondoOption[] | null]> => {
+  try {
+    const { data } = await axios.get(
+      `${getApiBaseUrl()}/mock/users/condos`
+    );
+
+    if (!data) {
+      console.error("No data returned from getAvailableCondos endpoint");
+      return [false, null];
+    }
+
+    return [true, data];
+  } catch (err: unknown) {
+    console.error("Error in getAvailableCondos", err);
+    return [false, null];
+  }
+};
