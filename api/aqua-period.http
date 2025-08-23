@@ -1,0 +1,20 @@
+@aqua_api_HostAddress = https://localhost:5001/api/periods
+# @aqua_api_HostAddress = http://localhost:5000/api/periods
+
+GET {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c/20240101/statements
+Accept: application/json
+
+### Response 200
+GET {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c/20240101
+Accept: application/json
+
+### Response 200       
+GET {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c/presign/nike1.pdf
+# Accept: application/json
+
+### Response 200
+### call the presigned URL to upload the file
+### attach the file to the request  
+POST {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c/send/20240101
+Accept: application/json
+Content-Type: application/json

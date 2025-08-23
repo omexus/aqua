@@ -1,0 +1,31 @@
+{
+  "name": "aqua-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:frontend\"",
+    "dev:api": "cd api && dotnet run",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:api && npm run build:frontend",
+    "build:api": "cd api && dotnet build",
+    "build:frontend": "cd frontend && npm run build",
+    "clean": "npm run clean:api && npm run clean:frontend",
+    "clean:api": "cd api && dotnet clean",
+    "clean:frontend": "cd frontend && rm -rf node_modules dist",
+    "install:all": "npm install && cd frontend && npm install",
+    "setup": "./scripts/dev-setup.sh",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

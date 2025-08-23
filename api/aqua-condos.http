@@ -1,0 +1,25 @@
+@aqua_api_HostAddress = https://localhost:5001/api/condos
+
+GET {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c
+Accept: application/json
+
+### Response 200
+GET {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c/1
+Accept: application/json
+
+### Response 200       
+GET {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c/presign/nike1.pdf
+# Accept: application/json
+
+### Response 200
+### call the presigned URL to upload the file
+### attach the file to the request  
+PUT https://aqua-stmts.s3.us-west-2.amazonaws.com/a2f02fa1-bbe4-46f8-90be-4aa43162400c/some/nike1.pdf?X-Amz-Expires=300&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIA45K5AYMPIZO3VYN6%2F20240725%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20240725T192033Z&X-Amz-SignedHeaders=host&X-Amz-Signature=e56c2ab8d45887b2eaa0847d0db5b9678281d12cebe28090df6d3188fa35ea0f
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; filename="nike1.pdf"
+Content-Type: application/pdf
+
+< ./sample-uploads/nike1.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

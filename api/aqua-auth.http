@@ -1,0 +1,13 @@
+@aqua_api_HostAddress = https://localhost:5001/api/auth
+
+GET {{aqua_api_HostAddress}}/a2f02fa1-bbe4-46f8-90be-4aa43162400c
+Accept: application/json
+
+### Response 200
+POST {{aqua_api_HostAddress}}/google
+Accept: application/json
+Content-Type: application/json
+
+{
+  "token": "4/0AQlEd8wKAaIAw8zKTn7sIze9J1eriD8nWM-FOBoqmX6kxt4aplHTdTrokEhbYuKuYPtLsg"
+}
