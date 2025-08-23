@@ -1,0 +1,88 @@
+.card {
+    background-color: var(--mantine-color-body);
+    cursor: pointer;
+
+    @mixin hover {
+        background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+      }
+
+  }
+  
+  .label {
+    font-family:
+      Greycliff CF,
+      var(--mantine-font-family);
+    font-weight: 700;
+    line-height: 1;
+  }
+  
+  .lead {
+    font-family:
+      Greycliff CF,
+      var(--mantine-font-family);
+    font-weight: 700;
+    font-size: rem(22px);
+    line-height: 1;
+  }
+  
+  .inner {
+    display: flex;
+  
+    @media (max-width: $mantine-breakpoint-xs) {
+      flex-direction: column;
+    }
+  }
+  
+  .ring {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+  
+    @media (max-width: $mantine-breakpoint-xs) {
+      justify-content: center;
+      margin-top: var(--mantine-spacing-md);
+    }
+  }
+
+  .clickable {
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    /* transition: background-color 0.3s; */
+  }
+  .clickable:hover {
+    background-color: #4C51BF; /* Assuming gray-200 is meant to be a Tailwind CSS color, this is its hex equivalent */
+  }
+
+  .clickable:hover p {
+    background-color: #4C51BF; /* Assuming gray-200 is meant to be a Tailwind CSS color, this is its hex equivalent */
+    color: hsl(0, 0%, 100%); /*white*/
+  }
+
+
+  .link {
+    display: block;
+    line-height: 1;
+    padding: rem(8px) rem(12px);
+    border-radius: var(--mantine-radius-sm);
+    text-decoration: none;
+    color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-0));
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 500;
+    cursor: pointer;
+
+    @mixin hover {
+      background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+    }
+  
+    [data-mantine-color-scheme] &[data-active] {
+      background-color: var(--mantine-color-blue-filled);
+      color: var(--mantine-color-white);
+    }
+  }
+
+  .progressSection {
+    &:not(:first-of-type) {
+      border-left: rem(3px) solid light-dark(var(--mantine-color-white), var(--mantine-color-dark-7));
+    }
+  }
