@@ -9,12 +9,12 @@ namespace aqua.api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IDynamoDBContext _context;
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger<UsersController> _logger;
 
-        public UserController(IDynamoDBContext context, ILogger<UserController> logger)
+        public UsersController(IDynamoDBContext context, ILogger<UsersController> logger)
         {
             _context = context;
             _logger = logger;

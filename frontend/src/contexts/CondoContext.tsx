@@ -2,6 +2,7 @@ import React from "react";
 import { createContext, useEffect, useState } from "react";
 import { getCondo, getTenantId } from "../helpers/Api.ts";
 import { useAuth } from "../hooks/useAuth";
+import { isUsingMockApi } from "../config/environment";
 
 export interface Condo { 
     id: string;
@@ -17,8 +18,17 @@ const CondoProvider = ({ children }: { children: React.ReactNode }) => {
 
     useEffect(() => { 
         async function fetchCondo() {
-            // Get tenant ID from authenticated user or default
-            const tenantId = user?.tenantId || getTenantId();
+            // Only fetch condo data if user is authenticated
+            if (!user) {
+                console.log("CondoProvider: No authenticated user, clearing condo data");
+                setCondo({ id: "", name: "", prefix: "" });
+                return;
+            }
+
+            // Get tenant ID from authenticated user
+            const tenantId = user.tenantId || getTenantId();
+            
+            console.log(`CondoProvider: Fetching condo for tenant ${tenantId} (${isUsingMockApi() ? 'MOCK' : 'LIVE'} API)`);
             
             await getCondo(tenantId).then(([success, condo]) => {
                 if (success && condo != null) { 

@@ -24,9 +24,9 @@ namespace aqua.api.Controllers
                 Name = "Marina Towers",
                 Prefix = "MARINA"
             },
-            ["c4f24fa3-ddf6-48fa-92dg-6cc65384622e"] = new CondoDto
+            ["c4f24fa3-ddf6-48fa-92df-6cc65384622e"] = new CondoDto
             {
-                Id = "c4f24fa3-ddf6-48fa-92dg-6cc65384622e",
+                Id = "c4f24fa3-ddf6-48fa-92df-6cc65384622e",
                 Name = "Sunset Heights",
                 Prefix = "SUNSET"
             }
@@ -40,7 +40,7 @@ namespace aqua.api.Controllers
             ["bob.johnson@aqua.com"] = "a2f02fa1-bbe4-46f8-90be-4aa43162400c",
             ["alice.brown@marina.com"] = "b3f13fa2-cce5-47f9-91cf-5bb54273511d",
             ["charlie.wilson@marina.com"] = "b3f13fa2-cce5-47f9-91cf-5bb54273511d",
-            ["diana.garcia@sunset.com"] = "c4f24fa3-ddf6-48fa-92dg-6cc65384622e"
+            ["diana.garcia@sunset.com"] = "c4f24fa3-ddf6-48fa-92df-6cc65384622e"
         };
 
         [HttpPost("auth/mock-login")]
@@ -373,6 +373,41 @@ namespace aqua.api.Controllers
         public ActionResult<List<CondoDto>> GetAvailableCondos()
         {
             return Ok(Condos.Values.ToList());
+        }
+
+        [HttpPost("condos")]
+        public ActionResult<CondoCreateResponse> CreateCondo([FromBody] CondoCreateRequest request)
+        {
+            try
+            {
+                // Generate a new condo ID
+                var newCondoId = Guid.NewGuid().ToString();
+                
+                // Create the new condo
+                var newCondo = new CondoDto
+                {
+                    Id = newCondoId,
+                    Name = request.Name,
+                    Prefix = request.Prefix
+                };
+                
+                // Add to the mock condos dictionary
+                Condos[newCondoId] = newCondo;
+                
+                return Ok(new CondoCreateResponse
+                {
+                    Success = true,
+                    Condo = newCondo
+                });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new CondoCreateResponse
+                {
+                    Success = false,
+                    Error = ex.Message
+                });
+            }
         }
 
         [HttpGet("users/test")]

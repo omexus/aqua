@@ -77,6 +77,7 @@ public class Startup
                 .AddScoped<IUnitRepository, DwellUnitRepository>()
                 .AddScoped<IS3Service, S3Service>()
                 .AddScoped(typeof(IRepository<Condo>), typeof(CondoRepository))
+                .AddScoped(typeof(IRepository<DwellUnit>), typeof(GenericRepository<DwellUnit>))
                 .AddScoped(typeof(IRepository<Period>), typeof(GenericRepository<Period>))
                 .AddScoped<EmailSenderService>()
                 .AddScoped<DataSeeder>();

@@ -23,3 +23,15 @@ Content-Type: application/pdf
 
 < ./sample-uploads/nike1.pdf
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Create New Condo
+POST {{aqua_api_HostAddress}}
+Content-Type: application/json
+
+{
+  "name": "Sunset Towers",
+  "prefix": "ST",
+  "numberOfUnits": 24
+}
+
+### Response 200

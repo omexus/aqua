@@ -25,6 +25,8 @@ import CondoContext from "../contexts/CondoContext";
 import { PeriodResponse } from "../types/StatementTypes";
 import { getPeriods } from "../helpers/Api.ts";
 import { useDisclosure } from "@mantine/hooks";
+import { useAuth } from "../hooks/useAuth";
+import { env } from "../config/environment";
 
 
 interface Props {
@@ -38,6 +40,7 @@ const Periods: React.FC<Props> = () => {
   
 
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { id : condoId } = CondoContext.useCondo();
 
 
@@ -53,12 +56,20 @@ const Periods: React.FC<Props> = () => {
   const total = getRandom(80, 100);
 
   useEffect(() => {
+    // Only fetch data if user is authenticated
+    if (!user) {
+      console.log("Periods: No authenticated user, not fetching data");
+      setData([]);
+      return;
+    }
+
+    console.log(`Periods: Fetching periods for authenticated user (${env.useMockApi ? 'MOCK' : 'LIVE'} API)`);
     open();
     getPeriods()
       .then(([, data]) => setData(data))
       .catch((error) => console.error(error))
       .finally(close);
-  }, []);
+  }, [user, open, close]);
 
   const onNewPeriod = (period: PeriodResponse) => {
     console.log("Periods.onNewPeriod", period);
@@ -104,13 +115,24 @@ const Periods: React.FC<Props> = () => {
           zIndex={1000}
           overlayProps={{ radius: "sm", blur: 2 }}
         />
-        <Group mt="md">
-          <Button rightSection={<IconFileImport size={14} />} onClick={openModal}>
-            Agregar Recibo
-          </Button>
-        </Group>
-        <Stack key="1.2">
-          {data.map((period, index) => (
+        {!user ? (
+          <Card withBorder p="lg" radius="md">
+            <Text ta="center" c="dimmed" size="lg">
+              🔐 Please sign in to view billing periods
+            </Text>
+            <Text ta="center" c="dimmed" size="sm" mt="xs">
+              You need to be authenticated to access this data
+            </Text>
+          </Card>
+        ) : (
+          <>
+            <Group mt="md">
+              <Button rightSection={<IconFileImport size={14} />} onClick={openModal}>
+                Agregar Recibo
+              </Button>
+            </Group>
+            <Stack key="1.2">
+              {data.map((period, index) => (
             // <div key={`${period.attribute}-${index}`}>
               <Card
               key={`${period.id}-${index}`}
@@ -188,7 +210,9 @@ const Periods: React.FC<Props> = () => {
               </Card>
             // </div>
           ))}
-        </Stack>
+            </Stack>
+          </>
+        )}
       </Stack>    
     </>
   );

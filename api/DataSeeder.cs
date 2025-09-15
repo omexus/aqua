@@ -55,7 +55,7 @@ namespace aqua.api
                 },
                 new Condo
                 {
-                    Id = Guid.Parse("c4f24fa3-ddf6-48fa-92dg-6cc65384622e"), // Sunset Heights
+                    Id = Guid.Parse("c4f24fa3-ddf6-48fa-92df-6cc65384622e"), // Sunset Heights
                     Attribute = "CONDO",
                     Name = "Sunset Heights",
                     Prefix = "SUNSET"
@@ -162,7 +162,7 @@ namespace aqua.api
         {
             var aquaCondoId = Guid.Parse("a2f02fa1-bbe4-46f8-90be-4aa43162400c");
             var marinaCondoId = Guid.Parse("b3f13fa2-cce5-47f9-91cf-5bb54273511d");
-            var sunsetCondoId = Guid.Parse("c4f24fa3-ddf6-48fa-92dg-6cc65384622e");
+            var sunsetCondoId = Guid.Parse("c4f24fa3-ddf6-48fa-92df-6cc65384622e");
 
             // Units for Aqua Condominium
             var aquaUnits = new List<DwellUnit>
@@ -261,7 +261,7 @@ namespace aqua.api
         {
             var aquaCondoId = Guid.Parse("a2f02fa1-bbe4-46f8-90be-4aa43162400c");
             var marinaCondoId = Guid.Parse("b3f13fa2-cce5-47f9-91cf-5bb54273511d");
-            var sunsetCondoId = Guid.Parse("c4f24fa3-ddf6-48fa-92dg-6cc65384622e");
+            var sunsetCondoId = Guid.Parse("c4f24fa3-ddf6-48fa-92df-6cc65384622e");
 
             // Periods for Aqua Condominium
             var aquaPeriods = new List<Period>

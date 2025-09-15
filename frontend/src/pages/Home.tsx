@@ -9,6 +9,7 @@ import { MockLogin } from '../components/auth/MockLogin';
 import { UserProvision } from '../components/auth/UserProvision';
 import { GoogleSignUp } from '../components/auth/GoogleSignUp';
 import { useAuth } from '../hooks/useAuth';
+import { env } from '../config/environment';
 
 export function Home() {
   const [opened, { toggle }] = useDisclosure();
@@ -61,13 +62,15 @@ export function Home() {
                 >
                   🔐 Sign Up / Login
                 </Button>
-                <Button 
-                  variant="light" 
-                  size="sm" 
-                  onClick={openMockLogin}
-                >
-                  🧪 Mock Login
-                </Button>
+                {env.enableMockLogin && (
+                  <Button 
+                    variant="light" 
+                    size="sm" 
+                    onClick={openMockLogin}
+                  >
+                    🧪 Mock Login
+                  </Button>
+                )}
                 <Button 
                   variant="outline" 
                   size="sm" 

@@ -7,6 +7,7 @@ import {
   PresignedUrl,
   StatementSaveRequest,
 } from "../types/StatementTypes";
+import { getApiBaseUrl, isUsingMockApi, getApiEndpoint } from "../config/environment";
 
 // Mock authentication types
 export interface MockLoginRequest {
@@ -75,19 +76,14 @@ export const getTenantId = (): string => {
   return "a2f02fa1-bbe4-46f8-90be-4aa43162400c"; // Default to Aqua
 };
 
-// Helper function to get API base URL
-const getApiBaseUrl = (): string => {
-  const apiUrl = import.meta.env.VITE_AQUA_API || 'http://localhost:5001';
-  console.log('getApiBaseUrl():', apiUrl);
-  return apiUrl;
-};
+
 
 // Mock authentication functions
 export const mockLogin = async (
   request: MockLoginRequest
 ): Promise<[success: boolean, response: MockLoginResponse | null]> => {
   try {
-    const apiUrl = `${getApiBaseUrl()}/mock/auth/mock-login`;
+    const apiUrl = getApiEndpoint('/auth/mock-login');
     console.log('Mock login attempt to:', apiUrl);
     console.log('Request payload:', request);
     
@@ -120,7 +116,7 @@ export const getCurrentUser = async (
 ): Promise<[success: boolean, response: MockUser | null]> => {
   try {
     const { data } = await axios.get(
-      `${getApiBaseUrl()}/mock/auth/me`,
+      getApiEndpoint('/auth/me'),
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -148,10 +144,9 @@ export const requestPreSignedUrl = async (
   try {
     const tenantId = getTenantId();
     const { data } = await axios.get(
-      getApiBaseUrl() +
-        `/statements/${tenantId}/presign/${period}/${encodeURIComponent(
-          file.name
-        )}`
+      getApiEndpoint(`/statements/${tenantId}/presign/${period}/${encodeURIComponent(
+        file.name
+      )}`)
     );
 
     if (!data) {
@@ -178,8 +173,7 @@ export const getUnit = async (
   try {
     const tenantId = getTenantId();
     const { data } = await axios.get(
-      getApiBaseUrl() +
-        `/units/${tenantId}/${unitId}`
+      getApiEndpoint(`/units/${tenantId}/${unitId}`)
     );
 
     if (!data) {
@@ -201,8 +195,7 @@ export const getUnits = async (): Promise<
   try {
     const tenantId = getTenantId();
     const { data } = await axios.get(
-      getApiBaseUrl() +
-        `/mock/units/${tenantId}`
+      getApiEndpoint(`/units/${tenantId}`)
     );
 
     if (!data) {
@@ -224,8 +217,7 @@ export const getPeriods = async (): Promise<
   try {
     const tenantId = getTenantId();
     const { data } = await axios.get(
-      getApiBaseUrl() +
-        `/mock/periods/${tenantId}`
+      getApiEndpoint(`/periods/${tenantId}`)
     );
 
     if (!data) {
@@ -247,8 +239,7 @@ export const getStatements = async (
   try {
     const tenantId = getTenantId();
     const { data } = await axios.get<PeriodWithStatementsResponse>(
-      getApiBaseUrl() +
-        `/periods/${tenantId}/${periodId}/statements`
+      getApiEndpoint(`/periods/${tenantId}/${periodId}/statements`)
     );
 
     if (!data) {
@@ -269,7 +260,7 @@ export const getCondo = async (
 ): Promise<[sucess: boolean, response: CondoResponse | null]> => {
   try {
     const { data } = await axios.get(
-      getApiBaseUrl() + `/mock/condos/${unitId}`
+      getApiEndpoint(`/condos/${unitId}`)
     );
 
     if (!data) {
@@ -291,7 +282,7 @@ export const saveStatement = async (
 ): Promise<[sucess: boolean, response: CondoResponse | null]> => {
   try {
     const { data } = await axios.post(
-      getApiBaseUrl() + `/statements/${id}`,
+      getApiEndpoint(`/statements/${id}`),
       request
     );
 
@@ -313,7 +304,7 @@ export const savePeriod = async (
   request: PeriodSaveRequest
 ): Promise<[sucess: boolean, response: PeriodResponse | null]> => {
   try {
-    const url = `${getApiBaseUrl()}/mock/periods/${id}`;
+    const url = getApiEndpoint(`/periods/${id}`);
     const { data } = await axios.post(url, request);
 
     if (!data) {
@@ -393,7 +384,7 @@ export const authenticateWithGoogle = async (
 ): Promise<[success: boolean, response: GoogleAuthResponse | null]> => {
   try {
     const { data } = await axios.post(
-      `${getApiBaseUrl()}/auth/google`,
+      getApiEndpoint('/auth/google'),
       request
     );
 
@@ -449,13 +440,25 @@ export interface CondoOption {
   prefix: string;
 }
 
+export interface CondoCreateRequest {
+  name: string;
+  prefix: string;
+  numberOfUnits: number;
+}
+
+export interface CondoCreateResponse {
+  success: boolean;
+  condo?: CondoOption;
+  error?: string;
+}
+
 // User provisioning functions
 export const provisionUser = async (
   request: UserProvisionRequest
 ): Promise<[success: boolean, response: UserProvisionResponse | null]> => {
   try {
     const { data } = await axios.post(
-      `${getApiBaseUrl()}/mock/users/provision`,
+      getApiEndpoint('/users/provision'),
       request
     );
 
@@ -484,7 +487,7 @@ export const getCurrentUserProfile = async (
 ): Promise<[success: boolean, response: any | null]> => {
   try {
     const { data } = await axios.get(
-      `${getApiBaseUrl()}/mock/users/me`,
+      getApiEndpoint('/users/me'),
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -507,7 +510,7 @@ export const getCurrentUserProfile = async (
 export const getAvailableCondos = async (): Promise<[success: boolean, response: CondoOption[] | null]> => {
   try {
     const { data } = await axios.get(
-      `${getApiBaseUrl()}/mock/users/condos`
+      getApiEndpoint('/users/condos')
     );
 
     if (!data) {
@@ -518,6 +521,35 @@ export const getAvailableCondos = async (): Promise<[success: boolean, response:
     return [true, data];
   } catch (err: unknown) {
     console.error("Error in getAvailableCondos", err);
+    return [false, null];
+  }
+};
+
+export const createCondo = async (
+  request: CondoCreateRequest
+): Promise<[success: boolean, response: CondoCreateResponse | null]> => {
+  try {
+    const { data } = await axios.post(
+      getApiEndpoint('/condos'),
+      request
+    );
+
+    if (!data || !data.success) {
+      console.error("Condo creation failed:", data);
+      return [false, null];
+    }
+
+    return [true, data];
+  } catch (err: unknown) {
+    console.error("Error in createCondo", err);
+    if (axios.isAxiosError(err)) {
+      console.error("Axios error details:", {
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        url: err.config?.url
+      });
+    }
     return [false, null];
   }
 };

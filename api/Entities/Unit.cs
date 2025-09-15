@@ -8,7 +8,7 @@ namespace aqua.api.Entities;
 /// </summary>
 // [DynamoDBTable("Statements")]
 [DynamoDBTable("Statements")]
-public class DwellUnit
+public class DwellUnit : IDynamoEntity
 {
     [DynamoDBHashKey] //Partition key
     public Guid Id { get; set; } = Guid.Empty;

@@ -30,6 +30,8 @@ import {
   formatDateToMonthYr,
 } from "../helpers/DateUtils";
 import { modals } from "@mantine/modals";
+import { useAuth } from "../hooks/useAuth";
+import { env } from "../config/environment";
 
 
 export function Statements() {
@@ -37,6 +39,7 @@ export function Statements() {
   const { id: periodId } = useParams();
   // const { id: condoId } = CondoContext.useCondo();
   const theme = useMantineTheme();
+  const { user } = useAuth();
 
   const [isMouseOver, setIsMouseOver] = useState(false);
   const [uploadInitiated, setUploadInitiated] = useState(false);
@@ -87,10 +90,26 @@ export function Statements() {
   } as unknown as PeriodWithStatementsResponse);
 
   useEffect(() => {
+    // Only fetch data if user is authenticated
+    if (!user) {
+      console.log("Statements: No authenticated user, not fetching data");
+      setData({
+        period: {
+          from: "",
+          to: "",
+          amount: 0,
+        },
+        statements: [],
+      } as unknown as PeriodWithStatementsResponse);
+      return;
+    }
+
     if (!periodId) {
       console.error("No periodId");
       return;
     }
+
+    console.log(`Statements: Fetching statements for period ${periodId} (${env.useMockApi ? 'MOCK' : 'LIVE'} API)`);
     handlers.open();
     getStatements(periodId)
       .then(([success, data]) => {
@@ -178,7 +197,18 @@ export function Statements() {
     setFiles(files);
   };
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <>
+      {!user ? (
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
+          <Text ta="center" c="dimmed" size="lg">
+            🔐 Please sign in to view statements
+          </Text>
+          <Text ta="center" c="dimmed" size="sm" mt="xs">
+            You need to be authenticated to access this data
+          </Text>
+        </Card>
+      ) : (
+        <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section withBorder inheritPadding py="xs">
         {/* <Image
           src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
@@ -367,7 +397,9 @@ export function Statements() {
           ></UploadStatements>
         </Stack>
       )}
-    </Card>
+        </Card>
+      )}
+    </>
   );
 }
 export default Statements;
