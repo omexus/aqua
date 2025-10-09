@@ -22,6 +22,7 @@ export interface AuthContextType {
   error: string | null;
   isUserProvisioned: boolean;
   checkUserProvisioning: () => Promise<boolean>;
+  forceCheckUserProvisioning: () => Promise<boolean>;
 }
 
 // Create the context with a default undefined value
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isUserProvisioned, setIsUserProvisioned] = useState(false);
+  const [hasCheckedProvisioning, setHasCheckedProvisioning] = useState(false);
 
   // Mock login function
   const handleMockLogin = async (credentials: MockLoginRequest): Promise<boolean> => {
@@ -223,12 +225,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setProfile(null);
     setError(null);
     setIsUserProvisioned(false);
+    setHasCheckedProvisioning(false);
     localStorage.removeItem('user');
   };
 
   const checkUserProvisioning = async (): Promise<boolean> => {
     if (!user?.token) {
+      console.log('AuthContext: No user token, returning false');
       return false;
+    }
+
+    // If we've already checked provisioning for this session, return cached result
+    if (hasCheckedProvisioning) {
+      console.log('AuthContext: Already checked provisioning this session, returning cached result:', isUserProvisioned);
+      return isUserProvisioned;
     }
 
     try {
@@ -238,19 +248,34 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
                        user?.userData?.name || 
                        profile?.email;
       
+      console.log('AuthContext: Checking user provisioning for email:', userEmail);
+      
       const [success, response] = await getCurrentUserProfile(user.token, userEmail as string);
+      console.log('AuthContext: User provisioning check result:', { success, response });
+      
+      setHasCheckedProvisioning(true);
+      
       if (success && response) {
+        console.log('AuthContext: User is provisioned, setting state to true');
         setIsUserProvisioned(true);
         return true;
       } else {
+        console.log('AuthContext: User is not provisioned, setting state to false');
         setIsUserProvisioned(false);
         return false;
       }
     } catch (err) {
-      console.error('Error checking user provisioning:', err);
+      console.error('AuthContext: Error checking user provisioning:', err);
+      setHasCheckedProvisioning(true);
       setIsUserProvisioned(false);
       return false;
     }
+  };
+
+  const forceCheckUserProvisioning = async (): Promise<boolean> => {
+    console.log('AuthContext: Force checking user provisioning');
+    setHasCheckedProvisioning(false);
+    return await checkUserProvisioning();
   };
 
   const value = { 
@@ -263,7 +288,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     isLoading, 
     error,
     isUserProvisioned,
-    checkUserProvisioning
+    checkUserProvisioning,
+    forceCheckUserProvisioning
   };
 
   return (

@@ -16,18 +16,18 @@ export function Home() {
   const [mockLoginOpened, { open: openMockLogin, close: closeMockLogin }] = useDisclosure();
   const [googleSignUpOpened, { open: openGoogleSignUp, close: closeGoogleSignUp }] = useDisclosure();
   const [userProvisionOpened, { open: openUserProvision, close: closeUserProvision }] = useDisclosure();
-  const { user, logout, isUserProvisioned, checkUserProvisioning } = useAuth();
+  const { user, logout, isUserProvisioned, checkUserProvisioning, forceCheckUserProvisioning } = useAuth();
 
-  // Check user provisioning when user logs in
+  // Check user provisioning when user logs in (only once per session)
   useEffect(() => {
-    if (user && !isUserProvisioned) {
+    if (user && !isUserProvisioned && !userProvisionOpened) {
       checkUserProvisioning().then((provisioned) => {
         if (!provisioned) {
           openUserProvision();
         }
       });
     }
-  }, [user, isUserProvisioned, checkUserProvisioning, openUserProvision]);
+  }, [user, isUserProvisioned, checkUserProvisioning, openUserProvision, userProvisionOpened]);
 
   return (
     <AppShell
@@ -133,16 +133,15 @@ export function Home() {
         <UserProvision 
           onSuccess={(userData) => {
             console.log('User provisioned successfully:', userData);
-            // Update the user data in the auth context
-            // This will trigger a re-check of user provisioning status
-            checkUserProvisioning().then((provisioned) => {
+            // Force re-check user provisioning status after successful provisioning
+            forceCheckUserProvisioning().then((provisioned) => {
               if (provisioned) {
                 closeUserProvision();
               }
             });
           }}
           onCancel={() => {
-            logout(); // Logout if user cancels provisioning
+            // Just close the modal, don't logout the user
             closeUserProvision();
           }}
         />

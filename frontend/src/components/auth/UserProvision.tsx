@@ -31,7 +31,7 @@ interface UserProvisionProps {
 }
 
 export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCancel }) => {
-  const { user, profile, checkUserProvisioning } = useAuth();
+  const { user, profile, forceCheckUserProvisioning } = useAuth();
   const [condos, setCondos] = useState<CondoOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -159,7 +159,7 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
         console.log('User provisioned successfully:', response);
         
         // Update the user provisioning status
-        await checkUserProvisioning();
+        await forceCheckUserProvisioning();
         
         if (onSuccess) {
           onSuccess(response.user);
