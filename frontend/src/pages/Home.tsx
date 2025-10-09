@@ -29,6 +29,13 @@ export function Home() {
     }
   }, [user, isUserProvisioned, checkUserProvisioning, openUserProvision, userProvisionOpened]);
 
+  // Reset userProvisionOpened when user changes or when user becomes provisioned
+  useEffect(() => {
+    if (isUserProvisioned && userProvisionOpened) {
+      closeUserProvision();
+    }
+  }, [isUserProvisioned, userProvisionOpened, closeUserProvision]);
+
   return (
     <AppShell
       layout="alt"

@@ -229,6 +229,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem('user');
   };
 
+  // Reset provisioning check when user changes
+  useEffect(() => {
+    if (user) {
+      setHasCheckedProvisioning(false);
+      setIsUserProvisioned(false);
+    }
+  }, [user?.token]); // Only reset when the actual user token changes
+
   const checkUserProvisioning = async (): Promise<boolean> => {
     if (!user?.token) {
       console.log('AuthContext: No user token, returning false');
