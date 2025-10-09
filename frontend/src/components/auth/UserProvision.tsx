@@ -31,7 +31,7 @@ interface UserProvisionProps {
 }
 
 export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCancel }) => {
-  const { user } = useAuth();
+  const { user, profile, checkUserProvisioning } = useAuth();
   const [condos, setCondos] = useState<CondoOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,7 +128,13 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
   };
 
   const handleSubmit = async (values: typeof form.values) => {
-    if (!user?.userData?.email) {
+    // Get user email from various possible locations in the user data structure
+    const userEmail = user?.userData?.email || 
+                     user?.userData?.user?.email || 
+                     user?.userData?.name || 
+                     profile?.email;
+    
+    if (!userEmail) {
       setError('No authenticated user found');
       return;
     }
@@ -139,7 +145,7 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
 
     try {
       const request: UserProvisionRequest = {
-        googleUserId: (user.userData.email as string), // Using email as Google User ID for now
+        googleUserId: userEmail as string, // Using email as Google User ID for now
         name: values.name,
         email: values.email,
         condoId: values.condoId,
@@ -151,6 +157,10 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
 
       if (success && response) {
         console.log('User provisioned successfully:', response);
+        
+        // Update the user provisioning status
+        await checkUserProvisioning();
+        
         if (onSuccess) {
           onSuccess(response.user);
         }

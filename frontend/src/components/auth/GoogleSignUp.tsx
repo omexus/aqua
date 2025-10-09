@@ -47,7 +47,7 @@ export function GoogleSignUp({ onSuccess, onError, onCancel }: GoogleSignUpProps
                         ✅ Google Authentication Complete
                     </Text>
                     <Text size="xs" c="dimmed">
-                        {(user?.userData?.name as string)} ({(user?.userData?.email as string)})
+                        {(user?.userData?.name || user?.userData?.user?.name || 'User')} ({(user?.userData?.email || user?.userData?.user?.email || 'user@example.com')})
                     </Text>
                 </Alert>
 

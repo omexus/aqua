@@ -133,7 +133,13 @@ export function Home() {
         <UserProvision 
           onSuccess={(userData) => {
             console.log('User provisioned successfully:', userData);
-            closeUserProvision();
+            // Update the user data in the auth context
+            // This will trigger a re-check of user provisioning status
+            checkUserProvisioning().then((provisioned) => {
+              if (provisioned) {
+                closeUserProvision();
+              }
+            });
           }}
           onCancel={() => {
             logout(); // Logout if user cancels provisioning

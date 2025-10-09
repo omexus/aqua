@@ -232,7 +232,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     try {
-      const [success, response] = await getCurrentUserProfile(user.token);
+      // Get user email from various possible locations in the user data structure
+      const userEmail = user?.userData?.email || 
+                       user?.userData?.user?.email || 
+                       user?.userData?.name || 
+                       profile?.email;
+      
+      const [success, response] = await getCurrentUserProfile(user.token, userEmail as string);
       if (success && response) {
         setIsUserProvisioned(true);
         return true;

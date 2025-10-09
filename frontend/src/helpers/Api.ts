@@ -483,17 +483,17 @@ export const provisionUser = async (
 };
 
 export const getCurrentUserProfile = async (
-  token: string
+  token: string,
+  email?: string
 ): Promise<[success: boolean, response: any | null]> => {
   try {
-    const { data } = await axios.get(
-      getApiEndpoint('/users/me'),
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const url = email ? `${getApiEndpoint('/users/me')}?email=${encodeURIComponent(email)}` : getApiEndpoint('/users/me');
+    
+    const { data } = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!data) {
       console.error("No data returned from getCurrentUserProfile endpoint");

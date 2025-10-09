@@ -3,6 +3,7 @@ using aqua.api.Dtos;
 using aqua.api.Entities;
 using aqua.api.Repositories;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 using System.Text.Json;
 
 namespace aqua.api.Controllers
@@ -111,10 +112,21 @@ namespace aqua.api.Controllers
         }
 
         [HttpGet("me")]
-        public async Task<ActionResult<UserDto>> GetCurrentUser([FromHeader(Name = "Authorization")] string authHeader)
+        public async Task<ActionResult<UserDto>> GetCurrentUser([FromHeader(Name = "Authorization")] string authHeader, [FromQuery] string? email = null)
         {
             try
             {
+                // For development, allow email parameter to check user provisioning
+                if (!string.IsNullOrEmpty(email))
+                {
+                    var userByEmail = await GetUserByGoogleId(email);
+                    if (userByEmail == null)
+                    {
+                        return NotFound();
+                    }
+                    return Ok(userByEmail);
+                }
+
                 // Extract Google User ID from auth header (in real app, validate JWT token)
                 var googleUserId = ExtractGoogleUserIdFromHeader(authHeader);
                 if (string.IsNullOrEmpty(googleUserId))
@@ -154,9 +166,10 @@ namespace aqua.api.Controllers
 
         private async Task<UserDto?> GetUserByGoogleId(string googleUserId)
         {
-            var userCondoQuery = _context.QueryAsync<User>($"USERCONDO#{googleUserId}#", new DynamoDBOperationConfig
+            // Scan for user-condo associations since we don't have the Attribute-index
+            var userCondoQuery = _context.ScanAsync<User>(new List<ScanCondition>
             {
-                IndexName = "Attribute-index"
+                new ScanCondition("Attribute", Amazon.DynamoDBv2.DocumentModel.ScanOperator.BeginsWith, $"USERCONDO#{googleUserId}#")
             });
 
             var userCondos = await userCondoQuery.GetRemainingAsync();
@@ -184,13 +197,20 @@ namespace aqua.api.Controllers
 
         private async Task<Condo?> GetCondoById(string condoId)
         {
-            var query = _context.QueryAsync<Condo>(condoId, new DynamoDBOperationConfig
+            if (!Guid.TryParse(condoId, out var condoGuid))
             {
-                IndexName = "Id-index"
+                return null;
+            }
+
+            // Use Scan since we don't have the Attribute-index
+            var query = _context.ScanAsync<Condo>(new List<ScanCondition>
+            {
+                new ScanCondition("Id", Amazon.DynamoDBv2.DocumentModel.ScanOperator.Equal, condoGuid),
+                new ScanCondition("Attribute", Amazon.DynamoDBv2.DocumentModel.ScanOperator.BeginsWith, "CONDO")
             });
 
             var condos = await query.GetRemainingAsync();
-            return condos.FirstOrDefault(c => c.Attribute.StartsWith("CONDO#"));
+            return condos.FirstOrDefault();
         }
 
         private async Task<List<CondoDto>> GetAllCondos()
