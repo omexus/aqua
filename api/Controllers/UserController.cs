@@ -134,13 +134,13 @@ namespace aqua.api.Controllers
                     return Unauthorized();
                 }
 
-                var user = await GetUserByGoogleId(googleUserId);
-                if (user == null)
+                var currentUser = await GetUserByGoogleId(googleUserId);
+                if (currentUser == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(user);
+                return Ok(currentUser);
             }
             catch (Exception ex)
             {

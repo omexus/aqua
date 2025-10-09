@@ -278,7 +278,10 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
 
               <Group justify="space-between">
                 {onCancel && (
-                  <Button variant="default" onClick={onCancel}>
+                  <Button variant="default" onClick={() => {
+                    console.log('Cancel button clicked in UserProvision component');
+                    onCancel();
+                  }}>
                     Cancel
                   </Button>
                 )}

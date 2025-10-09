@@ -130,7 +130,10 @@ export function Home() {
 
       <Modal 
         opened={userProvisionOpened} 
-        onClose={closeUserProvision}
+        onClose={() => {
+          console.log('Modal onClose triggered');
+          closeUserProvision();
+        }}
         title="🏠 Complete Your Profile"
         size="lg"
         closeOnClickOutside={false}
@@ -149,6 +152,7 @@ export function Home() {
           }}
           onCancel={() => {
             // Just close the modal, don't logout the user
+            console.log('Cancel button clicked, closing modal');
             closeUserProvision();
           }}
         />
