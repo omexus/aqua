@@ -1,6 +1,6 @@
 import { AppShell, Burger, Group, Button, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 // import { AppHeader } from '../components/Header';
 import PageNav from '../components/PageNav';
 import { Outlet } from 'react-router-dom';
@@ -16,18 +16,19 @@ export function Home() {
   const [mockLoginOpened, { open: openMockLogin, close: closeMockLogin }] = useDisclosure();
   const [googleSignUpOpened, { open: openGoogleSignUp, close: closeGoogleSignUp }] = useDisclosure();
   const [userProvisionOpened, { open: openUserProvision, close: closeUserProvision }] = useDisclosure();
+  const [userProvisionCancelled, setUserProvisionCancelled] = useState(false);
   const { user, logout, isUserProvisioned, checkUserProvisioning, forceCheckUserProvisioning } = useAuth();
 
   // Check user provisioning when user logs in (only once per session)
   useEffect(() => {
-    if (user && !isUserProvisioned && !userProvisionOpened) {
+    if (user && !isUserProvisioned && !userProvisionOpened && !userProvisionCancelled) {
       checkUserProvisioning().then((provisioned) => {
         if (!provisioned) {
           openUserProvision();
         }
       });
     }
-  }, [user, isUserProvisioned, checkUserProvisioning, openUserProvision, userProvisionOpened]);
+  }, [user, isUserProvisioned, checkUserProvisioning, openUserProvision, userProvisionOpened, userProvisionCancelled]);
 
   // Reset userProvisionOpened when user changes or when user becomes provisioned
   useEffect(() => {
@@ -35,6 +36,13 @@ export function Home() {
       closeUserProvision();
     }
   }, [isUserProvisioned, userProvisionOpened, closeUserProvision]);
+
+  // Reset cancelled flag when user changes
+  useEffect(() => {
+    if (user) {
+      setUserProvisionCancelled(false);
+    }
+  }, [user?.token]); // Only reset when the actual user token changes
 
   return (
     <AppShell
@@ -153,6 +161,7 @@ export function Home() {
           onCancel={() => {
             // Just close the modal, don't logout the user
             console.log('Cancel button clicked, closing modal');
+            setUserProvisionCancelled(true);
             closeUserProvision();
           }}
         />
