@@ -31,7 +31,7 @@ interface UserProvisionProps {
 }
 
 export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCancel }) => {
-  const { user, profile, forceCheckUserProvisioning } = useAuth();
+  const { user, forceCheckUserProvisioning } = useAuth();
   const [condos, setCondos] = useState<CondoOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -131,8 +131,7 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
     // Get user email from various possible locations in the user data structure
     const userEmail = user?.userData?.email || 
                      user?.userData?.user?.email || 
-                     user?.userData?.name || 
-                     profile?.email;
+                     user?.userData?.name;
     
     if (!userEmail) {
       setError('No authenticated user found');
@@ -164,15 +163,16 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
         if (onSuccess) {
           onSuccess(response.user);
         }
+        // Close the modal only on success
+        handlers.close();
       } else {
         setError(response?.error || 'Failed to provision user');
+        setIsLoading(false);
       }
     } catch (err) {
       console.error('Error provisioning user:', err);
       setError('An unexpected error occurred');
-    } finally {
       setIsLoading(false);
-      handlers.close();
     }
   };
 

@@ -37,12 +37,12 @@ export function Home() {
     }
   }, [isUserProvisioned, userProvisionOpened, closeUserProvision]);
 
-  // Reset cancelled flag when user changes
+  // Reset cancelled flag when user logs out (not when they log in)
   useEffect(() => {
-    if (user) {
+    if (!user) {
       setUserProvisionCancelled(false);
     }
-  }, [user?.token]); // Only reset when the actual user token changes
+  }, [user]); // Reset when user becomes null (logout)
 
   return (
     <AppShell
@@ -151,12 +151,9 @@ export function Home() {
         <UserProvision 
           onSuccess={(userData) => {
             console.log('User provisioned successfully:', userData);
-            // Force re-check user provisioning status after successful provisioning
-            forceCheckUserProvisioning().then((provisioned) => {
-              if (provisioned) {
-                closeUserProvision();
-              }
-            });
+            // The UserProvision component will handle closing the modal
+            // Just force re-check user provisioning status
+            forceCheckUserProvisioning();
           }}
           onCancel={() => {
             // Just close the modal, don't logout the user
