@@ -31,7 +31,7 @@ interface UserProvisionProps {
 }
 
 export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCancel }) => {
-  const { user, forceCheckUserProvisioning } = useAuth();
+  const { user, profile, forceCheckUserProvisioning } = useAuth();
   const [condos, setCondos] = useState<CondoOption[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,12 +128,22 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
   };
 
   const handleSubmit = async (values: typeof form.values) => {
-    // Get user email from various possible locations in the user data structure
-    const userEmail = user?.userData?.email || 
-                     user?.userData?.user?.email || 
-                     user?.userData?.name;
+    // Debug: Log the user data structure to understand what we're working with
+    console.log('UserProvision: Full user object:', user);
+    console.log('UserProvision: User data:', user?.userData);
+    console.log('UserProvision: Profile object:', profile);
+    
+      // Get user email from various possible locations in the user data structure
+      const userEmail = profile?.email || // First try the profile object (Google OAuth)
+                       (user?.userData as any)?.email || 
+                       (user?.userData as any)?.user?.email || 
+                       (user?.userData as any)?.name ||
+                       (user?.userData as any)?.sub; // Google user ID
+    
+    console.log('UserProvision: Extracted user email:', userEmail);
     
     if (!userEmail) {
+      console.error('UserProvision: No user email found in user data structure');
       setError('No authenticated user found');
       return;
     }
@@ -157,14 +167,17 @@ export const UserProvision: React.FC<UserProvisionProps> = ({ onSuccess, onCance
       if (success && response) {
         console.log('User provisioned successfully:', response);
         
-        // Update the user provisioning status
-        await forceCheckUserProvisioning();
+        // Reset loading state immediately
+        setIsLoading(false);
         
         if (onSuccess) {
           onSuccess(response.user);
         }
-        // Close the modal only on success
-        handlers.close();
+        
+        // Update the user provisioning status in the background
+        forceCheckUserProvisioning().catch(err => {
+          console.error('Error checking user provisioning:', err);
+        });
       } else {
         setError(response?.error || 'Failed to provision user');
         setIsLoading(false);

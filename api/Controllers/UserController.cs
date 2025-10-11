@@ -52,7 +52,7 @@ namespace aqua.api.Controllers
                 }
 
                 // Create new user
-                var user = new User
+                var newUser = new User
                 {
                     Id = Guid.NewGuid(),
                     Attribute = $"USER#{request.GoogleUserId}",
@@ -63,7 +63,7 @@ namespace aqua.api.Controllers
                     Role = request.Role
                 };
 
-                await _context.SaveAsync(user);
+                await _context.SaveAsync(newUser);
 
                 // Create user-condo association
                 var userCondo = new User
@@ -81,18 +81,18 @@ namespace aqua.api.Controllers
 
                 var userDto = new UserDto
                 {
-                    Id = user.Id.ToString(),
-                    UserId = user.UserId,
-                    Name = user.Name ?? "",
-                    Email = user.Email ?? "",
-                    Unit = user.Unit ?? "",
-                    Role = user.Role ?? "",
+                    Id = newUser.Id.ToString(),
+                    UserId = newUser.UserId,
+                    Name = newUser.Name ?? "",
+                    Email = newUser.Email ?? "",
+                    Unit = newUser.Unit ?? "",
+                    Role = newUser.Role ?? "",
                     CondoId = request.CondoId,
                     CondoName = condo.Name ?? "",
                     CondoPrefix = condo.Prefix ?? ""
                 };
 
-                _logger.LogInformation("User provisioned successfully: {UserId}", user.Id);
+                _logger.LogInformation("User provisioned successfully: {UserId}", newUser.Id);
 
                 return Ok(new UserProvisionResponse
                 {
@@ -119,7 +119,7 @@ namespace aqua.api.Controllers
                 // For development, allow email parameter to check user provisioning
                 if (!string.IsNullOrEmpty(email))
                 {
-                    var userByEmail = await GetUserByGoogleId(email);
+                    var userByEmail = await GetUserByEmail(email);
                     if (userByEmail == null)
                     {
                         return NotFound();
@@ -174,6 +174,49 @@ namespace aqua.api.Controllers
 
             var userCondos = await userCondoQuery.GetRemainingAsync();
             var userCondo = userCondos.FirstOrDefault();
+
+            if (userCondo == null) return null;
+
+            // Get condo information
+            var condo = await GetCondoById(userCondo.Attribute.Split('#')[2]);
+            if (condo == null) return null;
+
+            return new UserDto
+            {
+                Id = userCondo.Id.ToString(),
+                UserId = userCondo.UserId,
+                Name = userCondo.Name ?? "",
+                Email = userCondo.Email ?? "",
+                Unit = userCondo.Unit ?? "",
+                Role = userCondo.Role ?? "",
+                CondoId = condo.Id.ToString(),
+                CondoName = condo.Name ?? "",
+                CondoPrefix = condo.Prefix ?? ""
+            };
+        }
+
+        private async Task<UserDto?> GetUserByEmail(string email)
+        {
+            // First try to find by exact email match
+            var userCondoQuery = _context.ScanAsync<User>(new List<ScanCondition>
+            {
+                new ScanCondition("Email", Amazon.DynamoDBv2.DocumentModel.ScanOperator.Equal, email)
+            });
+
+            var userCondos = await userCondoQuery.GetRemainingAsync();
+            var userCondo = userCondos.FirstOrDefault();
+
+            // If not found by email, try to find by Google User ID (which might be the Google profile email)
+            if (userCondo == null)
+            {
+                var googleIdQuery = _context.ScanAsync<User>(new List<ScanCondition>
+                {
+                    new ScanCondition("Attribute", Amazon.DynamoDBv2.DocumentModel.ScanOperator.BeginsWith, $"USERCONDO#{email}#")
+                });
+
+                var googleIdCondos = await googleIdQuery.GetRemainingAsync();
+                userCondo = googleIdCondos.FirstOrDefault();
+            }
 
             if (userCondo == null) return null;
 
