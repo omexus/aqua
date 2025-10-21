@@ -20,7 +20,8 @@ import {
   IconReceipt,
   IconTrendingUp,
   IconPlus,
-  IconSettings
+  IconSettings,
+  IconLogout
 } from '@tabler/icons-react';
 import { useManagerAuth } from '../../contexts/ManagerAuthContext';
 import { ManagerManagement } from './ManagerManagement';
@@ -33,7 +34,7 @@ interface DashboardStats {
 }
 
 export const SimpleManagerDashboard: React.FC = () => {
-  const { user, isAuthenticated, hasCondos, requiresCondoAssignment } = useManagerAuth();
+  const { user, isAuthenticated, hasCondos, requiresCondoAssignment, logout } = useManagerAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [showManagerManagement, setShowManagerManagement] = useState(false);
@@ -95,6 +96,14 @@ export const SimpleManagerDashboard: React.FC = () => {
             >
               Manage Managers
             </Button>
+            <Button 
+              variant="outline" 
+              color="red"
+              leftSection={<IconLogout size={16} />}
+              onClick={logout}
+            >
+              Logout
+            </Button>
           </Group>
         </Paper>
       </Container>
@@ -109,12 +118,22 @@ export const SimpleManagerDashboard: React.FC = () => {
     <Container size="xl" py="xl">
       {/* Header */}
       <Stack gap="lg" mb="xl">
-        <div>
-          <Title order={1}>Manager Dashboard</Title>
-          <Text color="dimmed" size="lg">
-            Welcome back, {user?.manager.name}
-          </Text>
-        </div>
+        <Group justify="space-between" align="flex-start">
+          <div>
+            <Title order={1}>Manager Dashboard</Title>
+            <Text color="dimmed" size="lg">
+              Welcome back, {user?.manager.name}
+            </Text>
+          </div>
+          <Button
+            variant="outline"
+            color="red"
+            leftSection={<IconLogout size={16} />}
+            onClick={logout}
+          >
+            Logout
+          </Button>
+        </Group>
 
         {/* Active Condo Info */}
         {user?.activeCondo && (

@@ -90,6 +90,7 @@ namespace aqua.api.Middleware
             {
                 "/api/managerauth/google",
                 "/api/managerauth/me",
+                "/api/managerauth/test",
                 "/api/data/",
                 "/api/mock/",
                 "/api/managers",

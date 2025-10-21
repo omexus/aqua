@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using aqua.api.Entities;
 using aqua.api.Dtos;
 using aqua.api.Helpers;
@@ -34,18 +37,25 @@ namespace aqua.api.Controllers
         /// <summary>
         /// Google OAuth login for managers
         /// </summary>
+        [HttpGet("test")]
+        public IActionResult Test()
+        {
+            _logger.LogInformation("Test endpoint called");
+            return Ok(new { success = true, message = "Test endpoint working" });
+        }
+
         [HttpPost("google")]
         public async Task<IActionResult> GoogleLogin([FromBody] ManagerGoogleLoginRequest request)
         {
             try
             {
-                _logger.LogInformation("Manager Google login attempt for: {Email}", request.Email);
+                _logger.LogInformation("Manager Google login attempt with code: {Code}", request.Code);
 
-                // 1. Validate Google OAuth token
-                var googleUser = await ValidateGoogleToken(request.IdToken);
+                // 1. Exchange authorization code for tokens
+                var googleUser = await ExchangeCodeForUserInfo(request.Code, request.RedirectUri);
                 if (googleUser == null)
                 {
-                    _logger.LogWarning("Invalid Google token for: {Email}", request.Email);
+                    _logger.LogWarning("Failed to exchange code for user info");
                     return Unauthorized(new { success = false, error = "Invalid Google token" });
                 }
 
@@ -234,18 +244,89 @@ namespace aqua.api.Controllers
 
         #region Private Methods
 
+        private async Task<GoogleUserInfo?> ExchangeCodeForUserInfo(string code, string redirectUri)
+        {
+            try
+            {
+                _logger.LogInformation("Exchanging authorization code for tokens");
+                
+                var clientId = "252228382269-imsndvuvdtqfsbc4ecnf8jmf4m98p20a.apps.googleusercontent.com";
+                var clientSecret = "yGOCSPX-CMx2JjjfJx_ztxQFeETBAlO1R4Cy";
+
+                using (var httpClient = new HttpClient())
+                {
+                    // Exchange authorization code for tokens
+                    var tokenRequest = new Dictionary<string, string>
+                    {
+                        { "code", code },
+                        { "client_id", clientId },
+                        { "client_secret", clientSecret },
+                        { "redirect_uri", redirectUri },
+                        { "grant_type", "authorization_code" }
+                    };
+
+                    var content = new FormUrlEncodedContent(tokenRequest);
+                    var response = await httpClient.PostAsync("https://oauth2.googleapis.com/token", content);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogError("Failed to exchange authorization code for tokens. Status: {Status}", response.StatusCode);
+                        return null;
+                    }
+
+                    var tokenResponse = await response.Content.ReadAsStringAsync();
+                    var tokenData = JsonConvert.DeserializeObject<GoogleTokenResponse>(tokenResponse);
+
+                    if (tokenData == null)
+                    {
+                        _logger.LogError("Failed to deserialize token response");
+                        return null;
+                    }
+
+                    // Get user profile from Google
+                    var userInfoResponse = await httpClient.GetAsync($"https://www.googleapis.com/oauth2/v1/userinfo?access_token={tokenData.AccessToken}");
+                    
+                    if (!userInfoResponse.IsSuccessStatusCode)
+                    {
+                        _logger.LogError("Failed to get user info from Google. Status: {Status}", userInfoResponse.StatusCode);
+                        return null;
+                    }
+
+                    var userInfoJson = await userInfoResponse.Content.ReadAsStringAsync();
+                    var userInfo = JsonConvert.DeserializeObject<GoogleUserInfo>(userInfoJson);
+
+                    if (userInfo == null)
+                    {
+                        _logger.LogError("Failed to deserialize user info");
+                        return null;
+                    }
+
+                    _logger.LogInformation("Successfully retrieved user info for: {Email}", userInfo.Email);
+                    return userInfo;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error exchanging code for user info");
+                return null;
+            }
+        }
+
         private async Task<GoogleUserInfo?> ValidateGoogleToken(string idToken)
         {
             try
             {
+                _logger.LogInformation("Validating Google token: {IdToken}", idToken);
+                
                 // In a real implementation, you would validate the Google ID token
                 // For now, we'll use the existing Google OAuth validation logic
                 var clientId = "252228382269-imsndvuvdtqfsbc4ecnf8jmf4m98p20a.apps.googleusercontent.com";
-                
+
                 // This is a simplified validation - in production, use proper Google token validation
                 // For development, we'll accept specific users
                 if (idToken.Contains("hl.morales@gmail.com") || idToken == "hl.morales")
                 {
+                    _logger.LogInformation("Valid Google token for hl.morales");
                     return new GoogleUserInfo
                     {
                         Id = "hl.morales", // Realistic Google user ID format
@@ -254,15 +335,9 @@ namespace aqua.api.Controllers
                         Picture = "https://via.placeholder.com/150"
                     };
                 }
-                
-                // Fallback to mock user for other cases
-                return new GoogleUserInfo
-                {
-                    Id = "mock-google-user-id",
-                    Email = "manager@example.com",
-                    Name = "Manager User",
-                    Picture = "https://via.placeholder.com/150"
-                };
+
+                _logger.LogWarning("Invalid Google token: {IdToken}", idToken);
+                return null;
             }
             catch (Exception ex)
             {
@@ -275,6 +350,8 @@ namespace aqua.api.Controllers
         {
             try
             {
+                _logger.LogInformation("Getting manager by Google ID: {GoogleUserId}", googleUserId);
+                
                 var query = _context.QueryAsync<Manager>(new QueryOperationConfig
                 {
                     KeyExpression = new Expression
@@ -288,26 +365,38 @@ namespace aqua.api.Controllers
                 });
 
                 var managers = await query.GetRemainingAsync();
+                _logger.LogInformation("Found {Count} managers in database", managers.Count);
+                
                 var manager = managers.FirstOrDefault(m => m.GoogleUserId == googleUserId);
+                _logger.LogInformation("Manager found: {Found}, GoogleUserId: {GoogleUserId}", manager != null, googleUserId);
                 
                 // If no manager found, create one for our specific Google user
                 if (manager == null && googleUserId == "hl.morales")
                 {
-                    manager = new Manager
+                    _logger.LogInformation("Creating new manager for hl.morales");
+                    try
                     {
-                        Id = Guid.NewGuid(),
-                        Attribute = "MANAGER",
-                        GoogleUserId = googleUserId,
-                        Email = "hl.morales@gmail.com",
-                        Name = "Hugo Morales",
-                        Role = "Manager",
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    
-                    await _context.SaveAsync(manager);
-                    _logger.LogInformation("Created new manager for Google user: {GoogleUserId}", googleUserId);
+                        manager = new Manager
+                        {
+                            Id = Guid.NewGuid(),
+                            Attribute = "MANAGER",
+                            GoogleUserId = googleUserId,
+                            Email = "hl.morales@gmail.com",
+                            Name = "Hugo Morales",
+                            Role = "Manager",
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        
+                        await _context.SaveAsync(manager);
+                        _logger.LogInformation("Created new manager for Google user: {GoogleUserId}", googleUserId);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error creating manager for Google user: {GoogleUserId}", googleUserId);
+                        return null;
+                    }
                 }
-                
+
                 return manager;
             }
             catch (Exception ex)
@@ -449,7 +538,8 @@ namespace aqua.api.Controllers
 
     public class ManagerGoogleLoginRequest
     {
-        public string IdToken { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
+        public string RedirectUri { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
     }
 
@@ -464,6 +554,24 @@ namespace aqua.api.Controllers
         public string Email { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Picture { get; set; } = string.Empty;
+    }
+
+    public class GoogleTokenResponse
+    {
+        [JsonProperty("access_token")]
+        public string AccessToken { get; set; } = string.Empty;
+        
+        [JsonProperty("token_type")]
+        public string TokenType { get; set; } = string.Empty;
+        
+        [JsonProperty("expires_in")]
+        public int ExpiresIn { get; set; }
+        
+        [JsonProperty("refresh_token")]
+        public string? RefreshToken { get; set; }
+        
+        [JsonProperty("scope")]
+        public string? Scope { get; set; }
     }
 
     #endregion

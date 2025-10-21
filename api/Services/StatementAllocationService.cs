@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Amazon.DynamoDBv2.Model;
+using Amazon.DynamoDBv2;
 using aqua.api.Entities;
 using aqua.api.Dtos;
 
