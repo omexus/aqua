@@ -87,7 +87,12 @@ public class Startup
                 .AddScoped<EmailSenderService>()
                 .AddScoped<DataSeeder>()
                 .AddScoped<StatementAllocationService>()
-                .AddScoped<JwtTokenGenerator>();
+                .AddScoped<JwtTokenGenerator>(provider => 
+                    new JwtTokenGenerator(
+                        "your-super-secret-key-that-is-at-least-32-characters-long",
+                        "aqua-api",
+                        "aqua-managers"
+                    ));
 
         services.AddAWSService<IAmazonCognitoIdentityProvider>();
 

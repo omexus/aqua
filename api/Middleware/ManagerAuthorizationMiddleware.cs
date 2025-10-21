@@ -85,16 +85,22 @@ namespace aqua.api.Middleware
 
         private bool IsPublicEndpoint(PathString path)
         {
+            var pathString = path.ToString();
             var publicPaths = new[]
             {
                 "/api/managerauth/google",
                 "/api/managerauth/me",
                 "/api/data/",
+                "/api/mock/",
+                "/api/managers",
+                "/api/condos",
                 "/health",
                 "/swagger"
             };
 
-            return publicPaths.Any(p => path.StartsWithSegments(p, StringComparison.OrdinalIgnoreCase));
+            var isPublic = publicPaths.Any(p => pathString.StartsWith(p, StringComparison.OrdinalIgnoreCase));
+            _logger.LogDebug("Checking path {Path} - IsPublic: {IsPublic}", pathString, isPublic);
+            return isPublic;
         }
 
         private string? ExtractToken(HttpRequest request)

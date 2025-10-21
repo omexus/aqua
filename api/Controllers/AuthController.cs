@@ -60,7 +60,7 @@ namespace aqua.api.Controllers
             logger.LogDebug("GoogleLogin");
             var clientId = "252228382269-imsndvuvdtqfsbc4ecnf8jmf4m98p20a.apps.googleusercontent.com";
             var clientSecret = "yGOCSPX-CMx2JjjfJx_ztxQFeETBAlO1R4Cy";
-            var redirectUri = request.RedirectUri ?? "http://localhost:5173/callback";
+            var redirectUri = "http://localhost:5173/callback";
 
             try
             {

@@ -10,21 +10,21 @@ namespace aqua.api.Controllers
     public class MockController : ControllerBase
     {
         // Define the available condos
-        private static readonly Dictionary<string, CondoDto> Condos = new()
+        private static readonly Dictionary<string, aqua.api.Dtos.CondoDto> Condos = new()
         {
-            ["a2f02fa1-bbe4-46f8-90be-4aa43162400c"] = new CondoDto
+            ["a2f02fa1-bbe4-46f8-90be-4aa43162400c"] = new aqua.api.Dtos.CondoDto
             {
                 Id = "a2f02fa1-bbe4-46f8-90be-4aa43162400c",
                 Name = "Aqua Condominium",
                 Prefix = "AQUA"
             },
-            ["b3f13fa2-cce5-47f9-91cf-5bb54273511d"] = new CondoDto
+            ["b3f13fa2-cce5-47f9-91cf-5bb54273511d"] = new aqua.api.Dtos.CondoDto
             {
                 Id = "b3f13fa2-cce5-47f9-91cf-5bb54273511d",
                 Name = "Marina Towers",
                 Prefix = "MARINA"
             },
-            ["c4f24fa3-ddf6-48fa-92df-6cc65384622e"] = new CondoDto
+            ["c4f24fa3-ddf6-48fa-92df-6cc65384622e"] = new aqua.api.Dtos.CondoDto
             {
                 Id = "c4f24fa3-ddf6-48fa-92df-6cc65384622e",
                 Name = "Sunset Heights",
@@ -40,10 +40,13 @@ namespace aqua.api.Controllers
             ["bob.johnson@aqua.com"] = "a2f02fa1-bbe4-46f8-90be-4aa43162400c",
             ["alice.brown@marina.com"] = "b3f13fa2-cce5-47f9-91cf-5bb54273511d",
             ["charlie.wilson@marina.com"] = "b3f13fa2-cce5-47f9-91cf-5bb54273511d",
-            ["diana.garcia@sunset.com"] = "c4f24fa3-ddf6-48fa-92df-6cc65384622e"
+            ["diana.garcia@sunset.com"] = "c4f24fa3-ddf6-48fa-92df-6cc65384622e",
+            ["john.manager@aqua.com"] = "a2f02fa1-bbe4-46f8-90be-4aa43162400c",
+            ["hl.morales@gmail.com"] = "a2f02fa1-bbe4-46f8-90be-4aa43162400c",
         };
 
         [HttpPost("auth/mock-login")]
+        [Microsoft.AspNetCore.Authorization.AllowAnonymous]
         public ActionResult<object> MockLogin([FromBody] MockLoginRequest request)
         {
             if (UserTenantMapping.TryGetValue(request.Email, out var tenantId))
@@ -247,7 +250,7 @@ namespace aqua.api.Controllers
         }
 
         [HttpGet("condos/{id}")]
-        public ActionResult<CondoDto> GetCondo(string id)
+        public ActionResult<aqua.api.Dtos.CondoDto> GetCondo(string id)
         {
             if (!Condos.ContainsKey(id))
             {
@@ -370,7 +373,7 @@ namespace aqua.api.Controllers
         }
 
         [HttpGet("users/condos")]
-        public ActionResult<List<CondoDto>> GetAvailableCondos()
+        public ActionResult<List<aqua.api.Dtos.CondoDto>> GetAvailableCondos()
         {
             return Ok(Condos.Values.ToList());
         }
@@ -384,7 +387,7 @@ namespace aqua.api.Controllers
                 var newCondoId = Guid.NewGuid().ToString();
                 
                 // Create the new condo
-                var newCondo = new CondoDto
+                var newCondo = new aqua.api.Dtos.CondoDto
                 {
                     Id = newCondoId,
                     Name = request.Name,

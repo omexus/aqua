@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 using aqua.api.Entities;
 using aqua.api.Dtos;
 
@@ -224,7 +225,7 @@ namespace aqua.api.Services
                     CondoId = statement.Id.ToString(),
                     Period = statement.Period ?? "",
                     UtilityType = statement.UtilityType ?? "",
-                    AllocatedAmount = amountPerUnit,
+                    AllocatedAmount = amountPerUnit ?? 0.0,
                     Percentage = percentage,
                     AllocationMethod = "EQUAL",
                     UnitOwner = unit.Name,
@@ -262,7 +263,7 @@ namespace aqua.api.Services
                     CondoId = statement.Id.ToString(),
                     Period = statement.Period ?? "",
                     UtilityType = statement.UtilityType ?? "",
-                    AllocatedAmount = allocatedAmount,
+                    AllocatedAmount = allocatedAmount ?? 0.0,
                     Percentage = percentage,
                     AllocationMethod = "BY_SQUARE_FOOT",
                     UnitOwner = unit.Name,

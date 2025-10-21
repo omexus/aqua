@@ -76,7 +76,7 @@ public class CondosController : ControllerBase
                 await _context.SaveAsync(unit);
             }
 
-            var condoDto = new CondoDto
+            var condoDto = new aqua.api.Dtos.CondoDto
             {
                 Id = condo.Id.ToString(),
                 Name = condo.Name ?? "",

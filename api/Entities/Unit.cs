@@ -20,5 +20,6 @@ public class DwellUnit : IDynamoEntity
     public string? Email { get; set; }
     public required string Unit { get; set; }
     public string? Role { get; set; }
+    public double? SquareFootage { get; set; }
 }
 
