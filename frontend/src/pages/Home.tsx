@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
 // import { AppHeader } from '../components/Header';
 import PageNav from '../components/PageNav';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { MantineLogo } from '@mantinex/mantine-logo';
 import { MockLogin } from '../components/auth/MockLogin';
 import { UserProvision } from '../components/auth/UserProvision';
@@ -18,17 +18,19 @@ export function Home() {
   const [userProvisionOpened, { open: openUserProvision, close: closeUserProvision }] = useDisclosure();
   const [userProvisionCancelled, setUserProvisionCancelled] = useState(false);
   const { user, logout, isUserProvisioned, checkUserProvisioning, forceCheckUserProvisioning } = useAuth();
+  const location = useLocation();
 
-  // Check user provisioning when user logs in (only once per session)
+  // Check user provisioning when user logs in (only once per session and only on home route)
   useEffect(() => {
-    if (user && !isUserProvisioned && !userProvisionOpened && !userProvisionCancelled) {
+    // Only check provisioning when we're on the home route, not on nested routes
+    if (user && !isUserProvisioned && !userProvisionOpened && !userProvisionCancelled && location.pathname === '/') {
       checkUserProvisioning().then((provisioned) => {
         if (!provisioned) {
           openUserProvision();
         }
       });
     }
-  }, [user, isUserProvisioned, checkUserProvisioning, openUserProvision, userProvisionOpened, userProvisionCancelled]);
+  }, [user, isUserProvisioned, checkUserProvisioning, openUserProvision, userProvisionOpened, userProvisionCancelled, location.pathname]);
 
   // Note: Modal closing is now handled manually in the onSuccess handler
 
@@ -145,11 +147,9 @@ export function Home() {
       >
         <UserProvision 
           onSuccess={async (userData) => {
-            console.log('User provisioned successfully:', userData);
             // Close the modal and force re-check user provisioning status
             closeUserProvision();
             await forceCheckUserProvisioning();
-            console.log('User provisioning status updated after successful setup');
           }}
           onCancel={() => {
             // Just close the modal, don't logout the user

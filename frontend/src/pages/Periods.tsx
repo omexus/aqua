@@ -102,7 +102,7 @@ const Periods: React.FC<Props> = () => {
       >
         <div style={{ height: '100%', padding: '0 20px' }}>
           <NewPeriod 
-            id={condoId || "1"} 
+            id={condoId || "51c8fca9-9259-40f4-8100-3cb6a5f03f85"} 
             actionOnCancel={closeModal}
             actionOnConfirm={onNewPeriod}
           />

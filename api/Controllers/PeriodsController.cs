@@ -135,7 +135,7 @@ public class PeriodsController(
         //     return BadRequest("Could not find unit");
         // }
 
-        var condo = await condoRepository.GetByIdAsync(id);
+        var condo = await condoRepository.GetByIdAsync(id, "CONDO");
         if (condo == null)
         {
             return BadRequest("Could not find condo");

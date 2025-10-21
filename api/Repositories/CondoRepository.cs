@@ -125,7 +125,7 @@ public class CondoRepository(IDynamoDBContext context, ILogger<CondoRepository> 
                 // IndexName = "",
                 KeyExpression = new Expression
                 {
-                    ExpressionStatement = "Id = :v_Id and begins_with (#attr,:v_attr)",
+                    ExpressionStatement = "Id = :v_Id and #attr = :v_attr",
                     ExpressionAttributeNames = new Dictionary<string, string>
                     {
                         {"#attr", "Attribute"}
@@ -133,12 +133,12 @@ public class CondoRepository(IDynamoDBContext context, ILogger<CondoRepository> 
                     ExpressionAttributeValues = new Dictionary<string, DynamoDBEntry>
                     {
                         {":v_Id", id},
-                        {":v_attr", "CONDO#"}
+                        {":v_attr", attribute ?? "CONDO"}
                     }
                 }
             });
 
-            logger.LogInformation("Querying for Condo with Id {Id}", id);
+            logger.LogInformation("Querying for Condo with Id {Id} and Attribute {Attribute}", id, attribute);
             
             var result = await queryResult.GetNextSetAsync();
 
@@ -159,7 +159,7 @@ public class CondoRepository(IDynamoDBContext context, ILogger<CondoRepository> 
     {
         try
         {
-            return await context.LoadAsync<Condo>(id);
+            return await context.LoadAsync<Condo>(id, attribute);
         }
         catch (Exception ex)
         {

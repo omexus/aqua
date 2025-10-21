@@ -107,7 +107,7 @@ public class CondosController : ControllerBase
     public async Task<ActionResult<UnitDto>> GetUnit(Guid id)
     {
         _logger.LogDebug("Get Condo by ID {id}", id);
-        var condo = await _condoRepository.GetByIdAsync(id);
+        var condo = await _condoRepository.GetByIdAsync(id, "CONDO");
         
         if (condo == null) return NotFound();
 
