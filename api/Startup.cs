@@ -14,6 +14,8 @@ using Amazon.Extensions.NETCore.Setup;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Amazon.CognitoIdentityProvider;
+using aqua.api.Services;
+using aqua.api.Middleware;
 namespace aqua.api;
 
 public class Startup
@@ -79,8 +81,13 @@ public class Startup
                 .AddScoped(typeof(IRepository<Condo>), typeof(CondoRepository))
                 .AddScoped(typeof(IRepository<DwellUnit>), typeof(GenericRepository<DwellUnit>))
                 .AddScoped(typeof(IRepository<Period>), typeof(GenericRepository<Period>))
+                .AddScoped(typeof(IRepository<Manager>), typeof(GenericRepository<Manager>))
+                .AddScoped(typeof(IRepository<ManagerCondo>), typeof(GenericRepository<ManagerCondo>))
+                .AddScoped(typeof(IRepository<UnitAllocation>), typeof(GenericRepository<UnitAllocation>))
                 .AddScoped<EmailSenderService>()
-                .AddScoped<DataSeeder>();
+                .AddScoped<DataSeeder>()
+                .AddScoped<StatementAllocationService>()
+                .AddScoped<JwtTokenGenerator>();
 
         services.AddAWSService<IAmazonCognitoIdentityProvider>();
 
@@ -126,6 +133,10 @@ public class Startup
 
         app.UseRouting();
 
+        // Add manager authorization middleware
+        app.UseMiddleware<ManagerAuthorizationMiddleware>();
+
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.UseEndpoints(endpoints =>
