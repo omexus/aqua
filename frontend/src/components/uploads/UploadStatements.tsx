@@ -8,6 +8,7 @@ import {
   LoadingOverlay,
   ActionIcon,
   Stack,
+  TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -53,9 +54,27 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded }
       files: [] as MappedUnit[],
     },
     validate: {
-      files: {
-        email: (value) =>
-          /^\S+@\S+$/.test(value) ? null : "Direccion de correo invalida",
+      files: (value) => {
+        if (!value || value.length === 0) {
+          return "Debe agregar al menos un archivo";
+        }
+        
+        for (let i = 0; i < value.length; i++) {
+          const file = value[i];
+          if (!file.unit || file.unit.trim() === '') {
+            return `Unidad es requerida para el archivo ${i + 1}`;
+          }
+          if (!file.name || file.name.trim() === '') {
+            return `Nombre del propietario es requerido para el archivo ${i + 1}`;
+          }
+          if (!file.email || file.email.trim() === '') {
+            return `Email es requerido para el archivo ${i + 1}`;
+          }
+          if (!/^\S+@\S+$/.test(file.email)) {
+            return `Email inválido para el archivo ${i + 1}`;
+          }
+        }
+        return null;
       },
     },
   });
@@ -81,9 +100,42 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded }
 
   const selectedFiles = uploadForm.getValues().files.map((file, index) => (
     <Table.Tr key={`${file.name}${index}`}>
-      <Table.Td>{file.unit}</Table.Td>
-      <Table.Td align="left">{file.name}</Table.Td>
-      <Table.Td align="left">{file.email}</Table.Td>
+      <Table.Td>
+        <TextInput
+          value={file.unit}
+          onChange={(e) => {
+            const newFiles = [...uploadForm.getValues().files];
+            newFiles[index] = { ...newFiles[index], unit: e.target.value };
+            uploadForm.setFieldValue("files", newFiles);
+          }}
+          placeholder="Ej: 101"
+          size="sm"
+        />
+      </Table.Td>
+      <Table.Td align="left">
+        <TextInput
+          value={file.name}
+          onChange={(e) => {
+            const newFiles = [...uploadForm.getValues().files];
+            newFiles[index] = { ...newFiles[index], name: e.target.value };
+            uploadForm.setFieldValue("files", newFiles);
+          }}
+          placeholder="Nombre del propietario"
+          size="sm"
+        />
+      </Table.Td>
+      <Table.Td align="left">
+        <TextInput
+          value={file.email}
+          onChange={(e) => {
+            const newFiles = [...uploadForm.getValues().files];
+            newFiles[index] = { ...newFiles[index], email: e.target.value };
+            uploadForm.setFieldValue("files", newFiles);
+          }}
+          placeholder="email@ejemplo.com"
+          size="sm"
+        />
+      </Table.Td>
       <Table.Td align="left">{file.file?.name}</Table.Td>
       <Table.Td>
         <ActionIcon
@@ -116,6 +168,7 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded }
   };
 
   const handleOnSubmit = async (fileUnits: MappedUnit[]) => {
+    console.log("🚀 handleOnSubmit called with fileUnits:", fileUnits);
     handlers.open();
     console.log("handleOnSubmit... values", fileUnits);
     
@@ -186,13 +239,15 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded }
       />
       <h2>{`Estados de Cuenta ${periodId}`}</h2>
       <form
-        onSubmit={uploadForm.onSubmit(() =>
-          handleOnSubmit(uploadForm.getValues().files)
-        )}
+        onSubmit={uploadForm.onSubmit((values) => {
+          console.log('Form submitted with values:', values);
+          console.log('Form files:', values.files);
+          handleOnSubmit(values.files);
+        })}
       >
         <DropzoneButton onUpload={handleOnDrop} />
         {uploadForm.errors.files && (
-          <Text c="red" mt={5}>
+          <Text c="red" mt={5} size="sm">
             {uploadForm.errors.files}
           </Text>
         )}
@@ -218,8 +273,19 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded }
           <Button onClick={() => setUploadInitiated(false)}>
             Cancelar
           </Button>
-          <Button type="submit" disabled={mappedUnits.length == 0}>
-            Guardar
+          <Button 
+            type="submit" 
+            disabled={mappedUnits.length == 0}
+            onClick={(e) => {
+              console.log('🔴 Guardar button clicked!');
+              console.log('mappedUnits.length:', mappedUnits.length);
+              console.log('uploadForm.getValues().files:', uploadForm.getValues().files);
+              console.log('Form valid:', uploadForm.isValid());
+              console.log('Form errors:', uploadForm.errors);
+              console.log('Event:', e);
+            }}
+          >
+            Guardar ({mappedUnits.length})
           </Button>
         </Group>
       </form>
