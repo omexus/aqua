@@ -38,6 +38,9 @@ namespace aqua.api
             // Seed periods for each condo
             await SeedPeriodsAsync();
 
+            // Seed statements for each condo
+            await SeedStatementsAsync();
+
             Console.WriteLine("✅ Data seeding completed!");
         }
 
@@ -430,6 +433,96 @@ namespace aqua.api
             {
                 await _context.SaveAsync(period);
                 Console.WriteLine($"📅 Seeded Period: {period.From} to {period.To} ({period.Prefix})");
+            }
+        }
+
+        private async Task SeedStatementsAsync()
+        {
+            var aquaCondoId = Guid.Parse("a2f02fa1-bbe4-46f8-90be-4aa43162400c");
+            var marinaCondoId = Guid.Parse("b3f13fa2-cce5-47f9-91cf-5bb54273511d");
+            var sunsetCondoId = Guid.Parse("c4f24fa3-ddf6-48fa-92df-6cc65384622e");
+
+            // Statements for Aqua Condominium
+            var aquaStatements = new List<Statement>
+            {
+                new Statement
+                {
+                    Id = Guid.Parse("b893b27d-9ce1-4ed1-8172-3b62e04c59ef"), // Use the same GUID as frontend
+                    Attribute = "STATEMENT",
+                    UtilityType = "WATER",
+                    TotalAmount = 1500.00,
+                    Period = "2024-01",
+                    IsAllocated = false,
+                    Status = "PENDING",
+                    Provider = "City Water Company",
+                    Description = "Monthly water bill for January 2024",
+                    DueDate = DateTime.UtcNow.AddDays(15),
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Statement
+                {
+                    Id = Guid.Parse("c893b27d-9ce1-4ed1-8172-3b62e04c59ef"), // Use the same GUID as frontend
+                    Attribute = "STATEMENT",
+                    UtilityType = "ELECTRICITY",
+                    TotalAmount = 2200.00,
+                    Period = "2024-01",
+                    IsAllocated = true,
+                    Status = "ALLOCATED",
+                    Provider = "Power Company",
+                    Description = "Monthly electricity bill for January 2024",
+                    DueDate = DateTime.UtcNow.AddDays(10),
+                    AllocatedAt = DateTime.UtcNow.AddDays(-5),
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                }
+            };
+
+            // Statements for Marina Towers
+            var marinaStatements = new List<Statement>
+            {
+                new Statement
+                {
+                    Id = Guid.NewGuid(),
+                    Attribute = "STATEMENT",
+                    UtilityType = "WATER",
+                    TotalAmount = 1800.00,
+                    Period = "2024-01",
+                    IsAllocated = false,
+                    Status = "PENDING",
+                    Provider = "Marina Water Co",
+                    Description = "Monthly water bill for January 2024",
+                    DueDate = DateTime.UtcNow.AddDays(20),
+                    CreatedAt = DateTime.UtcNow
+                }
+            };
+
+            // Statements for Sunset Heights
+            var sunsetStatements = new List<Statement>
+            {
+                new Statement
+                {
+                    Id = Guid.NewGuid(),
+                    Attribute = "STATEMENT",
+                    UtilityType = "TRASH",
+                    TotalAmount = 800.00,
+                    Period = "2024-01",
+                    IsAllocated = false,
+                    Status = "PENDING",
+                    Provider = "Waste Management",
+                    Description = "Monthly trash collection for January 2024",
+                    DueDate = DateTime.UtcNow.AddDays(25),
+                    CreatedAt = DateTime.UtcNow
+                }
+            };
+
+            var allStatements = new List<Statement>();
+            allStatements.AddRange(aquaStatements);
+            allStatements.AddRange(marinaStatements);
+            allStatements.AddRange(sunsetStatements);
+
+            foreach (var statement in allStatements)
+            {
+                await _context.SaveAsync(statement);
+                Console.WriteLine($"📄 Seeded Statement: {statement.UtilityType} - ${statement.TotalAmount} ({statement.Period})");
             }
         }
     }

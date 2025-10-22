@@ -66,7 +66,7 @@ export const ManagerAuthProvider = ({ children }: ManagerAuthProviderProps) => {
       try {
         const response = await axios.post('http://localhost:5001/api/managerauth/google', {
           code: codeResponse.code,
-          redirectUri: window.location.origin + '/callback'
+          redirectUri: 'http://localhost:5173/callback'  // Use the configured redirect URI
         });
 
         if (response.data.success) {
@@ -82,6 +82,20 @@ export const ManagerAuthProvider = ({ children }: ManagerAuthProviderProps) => {
           setUser(managerUser);
           localStorage.setItem('managerUser', JSON.stringify(managerUser));
           setIsLoading(false);
+        } else if (response.data.requiresCondoAssignment) {
+          // Handle case where manager needs condo assignment
+          const { manager } = response.data;
+          const managerUser: ManagerUser = {
+            token: null,
+            manager,
+            condos: [],
+            activeCondo: null
+          };
+
+          setUser(managerUser);
+          localStorage.setItem('managerUser', JSON.stringify(managerUser));
+          setIsLoading(false);
+          // Don't set error - let the component handle the condo assignment flow
         } else {
           setError(response.data.error || 'Authentication failed');
           setIsLoading(false);

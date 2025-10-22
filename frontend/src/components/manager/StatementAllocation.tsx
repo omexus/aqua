@@ -60,6 +60,8 @@ export const StatementAllocation: React.FC = () => {
   const [allocationMethod, setAllocationMethod] = useState<string>('EQUAL');
   const [loading, setLoading] = useState(false);
   const [allocating, setAllocating] = useState(false);
+  const [manualAmounts, setManualAmounts] = useState<{[unitNumber: string]: number}>({});
+  const [units, setUnits] = useState<{unitNumber: string, owner: string, squareFootage?: number}[]>([]);
 
   const allocationMethods: AllocationMethod[] = [
     {
@@ -76,14 +78,31 @@ export const StatementAllocation: React.FC = () => {
       value: 'BY_UNITS',
       label: 'By Unit Count',
       description: 'Split costs based on unit count'
+    },
+    {
+      value: 'MANUAL',
+      label: 'Manual Entry',
+      description: 'Enter custom amounts for each unit'
     }
   ];
 
   useEffect(() => {
     if (user?.activeCondo) {
       loadStatements();
+      loadUnits();
     }
   }, [user?.activeCondo]);
+
+  useEffect(() => {
+    if (allocationMethod === 'MANUAL' && units.length > 0) {
+      // Initialize manual amounts with zeros
+      const initialAmounts: {[unitNumber: string]: number} = {};
+      units.forEach(unit => {
+        initialAmounts[unit.unitNumber] = 0;
+      });
+      setManualAmounts(initialAmounts);
+    }
+  }, [allocationMethod, units]);
 
   const loadStatements = async () => {
     if (!user?.activeCondo) return;
@@ -94,14 +113,14 @@ export const StatementAllocation: React.FC = () => {
       // Mock data for now
       setStatements([
         {
-          id: '1',
+          id: 'b893b27d-9ce1-4ed1-8172-3b62e04c59ef',
           utilityType: 'WATER',
           totalAmount: 1500.00,
           period: '2024-01',
           isAllocated: false
         },
         {
-          id: '2',
+          id: 'c893b27d-9ce1-4ed1-8172-3b62e04c59ef',
           utilityType: 'ELECTRICITY',
           totalAmount: 2200.00,
           period: '2024-01',
@@ -116,6 +135,37 @@ export const StatementAllocation: React.FC = () => {
     }
   };
 
+  const loadUnits = async () => {
+    if (!user?.activeCondo) return;
+
+    setLoading(true);
+    try {
+      // TODO: Implement actual API call
+      // Mock data for now
+      setUnits([
+        {
+          unitNumber: '101',
+          owner: 'John Smith',
+          squareFootage: 1200
+        },
+        {
+          unitNumber: '102',
+          owner: 'Jane Doe',
+          squareFootage: 1100
+        },
+        {
+          unitNumber: '201',
+          owner: 'Bob Johnson',
+          squareFootage: 1300
+        }
+      ]);
+    } catch (error) {
+      console.error('Error loading units:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadAllocations = async (statementId: string) => {
     if (!user?.activeCondo) return;
 
@@ -125,7 +175,7 @@ export const StatementAllocation: React.FC = () => {
       // Mock data for now
       setAllocations([
         {
-          id: '1',
+          id: 'a893b27d-9ce1-4ed1-8172-3b62e04c59ef',
           unitNumber: '101',
           allocatedAmount: 150.00,
           percentage: 10.0,
@@ -133,7 +183,7 @@ export const StatementAllocation: React.FC = () => {
           status: 'PENDING'
         },
         {
-          id: '2',
+          id: 'b893b27d-9ce1-4ed1-8172-3b62e04c59ef',
           unitNumber: '102',
           allocatedAmount: 150.00,
           percentage: 10.0,
@@ -151,18 +201,35 @@ export const StatementAllocation: React.FC = () => {
   const handleAllocate = async () => {
     if (!selectedStatement || !user?.activeCondo) return;
 
+    // Validate manual allocation amounts
+    if (allocationMethod === 'MANUAL') {
+      const totalAmount = Object.values(manualAmounts).reduce((sum, amount) => sum + amount, 0);
+      const statementAmount = selectedStatementData?.totalAmount || 0;
+      
+      if (Math.abs(totalAmount - statementAmount) > 0.01) {
+        alert(`Total manual amounts ($${totalAmount.toFixed(2)}) must equal statement amount ($${statementAmount.toFixed(2)})`);
+        return;
+      }
+    }
+
     setAllocating(true);
     try {
-      // TODO: Implement actual API call
+      const requestBody: any = {
+        allocationMethod
+      };
+
+      // Add manual amounts if manual allocation
+      if (allocationMethod === 'MANUAL') {
+        requestBody.manualAmounts = manualAmounts;
+      }
+
       const response = await fetch(`http://localhost:5001/api/statementallocation/${user.activeCondo.id}/statements/${selectedStatement}/allocate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${user.token}`
         },
-        body: JSON.stringify({
-          allocationMethod
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (response.ok) {
@@ -272,6 +339,69 @@ export const StatementAllocation: React.FC = () => {
                       sx={{ ml: 1 }}
                     />
                   )}
+                </Box>
+              )}
+
+              {/* Manual Allocation Form */}
+              {allocationMethod === 'MANUAL' && selectedStatement && !selectedStatementData?.isAllocated && (
+                <Box sx={{ mt: 3 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Manual Amount Entry
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Enter the amount for each unit. Total must equal ${selectedStatementData?.totalAmount.toFixed(2)}.
+                  </Typography>
+                  
+                  <Grid container spacing={2}>
+                    {units.map((unit) => (
+                      <Grid item xs={12} sm={6} md={4} key={unit.unitNumber}>
+                        <Box sx={{ p: 2, border: '1px solid #e0e0e0', borderRadius: 1 }}>
+                          <Typography variant="subtitle2" gutterBottom>
+                            Unit {unit.unitNumber}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" display="block">
+                            {unit.owner}
+                          </Typography>
+                          <Box sx={{ mt: 1 }}>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={manualAmounts[unit.unitNumber] || 0}
+                              onChange={(e) => {
+                                const newAmounts = { ...manualAmounts };
+                                newAmounts[unit.unitNumber] = parseFloat(e.target.value) || 0;
+                                setManualAmounts(newAmounts);
+                              }}
+                              style={{
+                                width: '100%',
+                                padding: '8px',
+                                border: '1px solid #ccc',
+                                borderRadius: '4px',
+                                fontSize: '14px'
+                              }}
+                              placeholder="0.00"
+                            />
+                          </Box>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                  
+                  <Box sx={{ mt: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+                    <Typography variant="body2">
+                      <strong>Total Entered:</strong> ${Object.values(manualAmounts).reduce((sum, amount) => sum + amount, 0).toFixed(2)}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>Statement Amount:</strong> ${selectedStatementData?.totalAmount.toFixed(2)}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      color={Math.abs(Object.values(manualAmounts).reduce((sum, amount) => sum + amount, 0) - (selectedStatementData?.totalAmount || 0)) < 0.01 ? 'success.main' : 'error.main'}
+                    >
+                      <strong>Difference:</strong> ${(Object.values(manualAmounts).reduce((sum, amount) => sum + amount, 0) - (selectedStatementData?.totalAmount || 0)).toFixed(2)}
+                    </Typography>
+                  </Box>
                 </Box>
               )}
 
