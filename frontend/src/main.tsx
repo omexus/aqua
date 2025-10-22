@@ -7,7 +7,7 @@ import './index.css'
 import { GoogleOAuthProvider } from "@react-oauth/google"
 
 // Switch between regular app and manager app
-const USE_MANAGER_APP = true; // Set to true to use the new manager app
+const USE_MANAGER_APP = false; // Set to true to use the new manager app
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <GoogleOAuthProvider clientId="252228382269-imsndvuvdtqfsbc4ecnf8jmf4m98p20a.apps.googleusercontent.com">
