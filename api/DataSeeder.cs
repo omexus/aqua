@@ -456,8 +456,7 @@ namespace aqua.api
                     Status = "PENDING",
                     Provider = "City Water Company",
                     Description = "Monthly water bill for January 2024",
-                    DueDate = DateTime.UtcNow.AddDays(15),
-                    CreatedAt = DateTime.UtcNow
+                    DueDate = DateTime.UtcNow.AddDays(15)
                 },
                 new Statement
                 {
@@ -471,8 +470,7 @@ namespace aqua.api
                     Provider = "Power Company",
                     Description = "Monthly electricity bill for January 2024",
                     DueDate = DateTime.UtcNow.AddDays(10),
-                    AllocatedAt = DateTime.UtcNow.AddDays(-5),
-                    CreatedAt = DateTime.UtcNow.AddDays(-10)
+                    AllocatedAt = DateTime.UtcNow.AddDays(-5)
                 }
             };
 
@@ -490,8 +488,7 @@ namespace aqua.api
                     Status = "PENDING",
                     Provider = "Marina Water Co",
                     Description = "Monthly water bill for January 2024",
-                    DueDate = DateTime.UtcNow.AddDays(20),
-                    CreatedAt = DateTime.UtcNow
+                    DueDate = DateTime.UtcNow.AddDays(20)
                 }
             };
 
@@ -509,8 +506,7 @@ namespace aqua.api
                     Status = "PENDING",
                     Provider = "Waste Management",
                     Description = "Monthly trash collection for January 2024",
-                    DueDate = DateTime.UtcNow.AddDays(25),
-                    CreatedAt = DateTime.UtcNow
+                    DueDate = DateTime.UtcNow.AddDays(25)
                 }
             };
 
