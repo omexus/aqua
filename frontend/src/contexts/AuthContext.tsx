@@ -87,29 +87,52 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  // Fallback login for direct Google OAuth when backend is not available
+  // Manager authentication using the manager auth endpoint
   const directGoogleLogin = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      console.log('Direct Google login successful:', tokenResponse);
-      const userData = {
-        token: tokenResponse.access_token,
-        userData: {
-          access_token: tokenResponse.access_token,
-          token_type: tokenResponse.token_type,
-          expires_in: tokenResponse.expires_in,
-          scope: tokenResponse.scope
+    onSuccess: async (codeResponse) => {
+      console.log('Manager Google login successful, code:', codeResponse.code);
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await axios.post('http://localhost:5000/api/managerauth/google', {
+          code: codeResponse.code,
+          redirectUri: 'http://localhost:5173/callback'
+        });
+
+        if (response.data.success) {
+          const { token, manager, condos } = response.data;
+          
+          const userData = {
+            token,
+            userData: {
+              email: manager.email,
+              name: manager.name,
+              manager: manager,
+              condos: condos,
+              activeCondo: condos.find((c: any) => c.isDefault) || condos[0] || null
+            }
+          };
+
+          setUser(userData);
+          localStorage.setItem('user', JSON.stringify(userData));
+          setIsLoading(false);
+        } else {
+          setError(response.data.error || 'Authentication failed');
+          setIsLoading(false);
         }
-      };
-      
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      setIsLoading(false);
+      } catch (err: any) {
+        console.error('Manager Google OAuth error:', err);
+        setError(err.response?.data?.error || 'Authentication failed');
+        setIsLoading(false);
+      }
     },
     onError: (error) => {
-      console.error('Direct Google login failed:', error);
-      setError('Authentication failed. Please try again.');
+      console.error('Manager Google login failed:', error);
+      setError('Google authentication failed');
       setIsLoading(false);
-    }
+    },
+    flow: 'auth-code',
   });
 
   // Load user from localStorage on mount
