@@ -391,16 +391,6 @@ namespace aqua.api
                     Prefix = "AQUA",
                     Generated = 0,
                     Amount = 1500.00
-                },
-                new Period
-                {
-                    Id = Guid.NewGuid(),
-                    Attribute = $"PERIOD#{aquaCondoId}",
-                    From = "2025-01-01",
-                    To = "2025-01-31",
-                    Prefix = "AQUA",
-                    Generated = 0,
-                    Amount = 1500.00
                 }
             };
 
