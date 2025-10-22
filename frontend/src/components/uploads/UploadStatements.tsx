@@ -101,7 +101,7 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded, 
     <Table.Tr key={`file-${index}-${file.file?.name || 'unknown'}`}>
       <Table.Td>
         <TextInput
-          value={file.unit}
+          defaultValue={file.unit || ""}
           onChange={(e) => {
             const newFiles = [...uploadForm.getValues().files];
             newFiles[index] = { ...newFiles[index], unit: e.target.value };
@@ -113,7 +113,7 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded, 
       </Table.Td>
       <Table.Td align="left">
         <TextInput
-          value={file.name}
+          defaultValue={file.name || ""}
           onChange={(e) => {
             const newFiles = [...uploadForm.getValues().files];
             newFiles[index] = { ...newFiles[index], name: e.target.value };
@@ -125,7 +125,7 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded, 
       </Table.Td>
       <Table.Td align="left">
         <TextInput
-          value={file.email}
+          defaultValue={file.email || ""}
           onChange={(e) => {
             const newFiles = [...uploadForm.getValues().files];
             newFiles[index] = { ...newFiles[index], email: e.target.value };
