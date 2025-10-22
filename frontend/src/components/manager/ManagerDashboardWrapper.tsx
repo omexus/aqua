@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { SimpleManagerDashboard } from './SimpleManagerDashboard';
 import { SimpleManagerLogin } from './SimpleManagerLogin';
 import { StatementAllocation } from './StatementAllocation';
+import { ManageUnits } from './ManageUnits';
 import { Loader, Center } from '@mantine/core';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -34,6 +35,14 @@ const AppRoutes: React.FC = () => {
     return (
       <ProtectedRoute>
         <StatementAllocation />
+      </ProtectedRoute>
+    );
+  }
+
+  if (location.pathname === '/manager-dashboard/units') {
+    return (
+      <ProtectedRoute>
+        <ManageUnits />
       </ProtectedRoute>
     );
   }

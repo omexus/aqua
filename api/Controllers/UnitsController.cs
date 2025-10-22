@@ -3,6 +3,7 @@ using aqua.api.Repositories;
 using aqua.api.Dtos;
 using UnitDto = aqua.api.Dtos.UnitDto;
 using aqua.api.Helpers;
+using aqua.api.Entities;
 
 namespace aqua.api.Controllers;
 
@@ -38,6 +39,43 @@ public class UnitsController : ControllerBase
         var stmts = await _unitRepository.GetListAsync(id, "UID#");
 
         return Ok(UnitMapper.UnitsToDto(stmts));
+    }
+
+    [HttpPost("{id}/bulk")]
+    public async Task<ActionResult<IEnumerable<UnitDto>>> CreateUnits(Guid id, [FromBody] CreateUnitsRequest request)
+    {
+        _logger.LogDebug("Create {Count} units for condo {CondoId}", request.Units.Count, id);
+        
+        if (request.Units.Count > 10)
+        {
+            return BadRequest("Cannot create more than 10 units at once");
+        }
+
+        var createdUnits = new List<UnitDto>();
+        
+        foreach (var unitRequest in request.Units)
+        {
+            var unit = new DwellUnit
+            {
+                Id = id,
+                Attribute = $"UID#{unitRequest.Unit}",
+                UserId = Guid.NewGuid().ToString(),
+                Prefix = request.Prefix,
+                Name = unitRequest.Name,
+                Email = unitRequest.Email,
+                Unit = unitRequest.Unit,
+                Role = "TENANT",
+                SquareFootage = unitRequest.SquareFootage
+            };
+
+            var success = await _unitRepository.CreateAsync(id, unit, "UID#");
+            if (success)
+            {
+                createdUnits.Add(UnitMapper.UnitToDto(unit));
+            }
+        }
+
+        return Ok(createdUnits);
     }
 
     //  [HttpGet("{id}/{period}")]  

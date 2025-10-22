@@ -136,8 +136,7 @@ export const SimpleManagerDashboard: React.FC = () => {
         window.location.href = '/manager-dashboard/statements';
         break;
       case 'units':
-        // TODO: Navigate to units page when created
-        console.log('Navigate to units');
+        window.location.href = '/manager-dashboard/units';
         break;
       case 'allocations':
         // TODO: Navigate to allocations page when created
