@@ -1,16 +1,13 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { ModalsProvider } from '@mantine/modals';
-import { ManagerAuthProvider, useManagerAuth } from '../../contexts/ManagerAuthContext';
 import { SimpleManagerDashboard } from './SimpleManagerDashboard';
-import { SimpleManagerLogin } from './SimpleManagerLogin';
-import { CondoAssignmentPrompt } from './CondoAssignmentPrompt';
 import { StatementAllocation } from './StatementAllocation';
 import { Loader, Center } from '@mantine/core';
+import { useAuth } from '../../hooks/useAuth';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated, isLoading, requiresCondoAssignment } = useManagerAuth();
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -20,12 +17,16 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     );
   }
 
-  if (!isAuthenticated) {
-    return <SimpleManagerLogin />;
-  }
-
-  if (requiresCondoAssignment) {
-    return <CondoAssignmentPrompt />;
+  if (!user) {
+    return (
+      <Center h="100vh">
+        <div>
+          <h2>Authentication Required</h2>
+          <p>Please log in to access the Manager Dashboard.</p>
+          <p>Use the Login button in the navigation menu.</p>
+        </div>
+      </Center>
+    );
   }
 
   return <>{children}</>;
@@ -33,22 +34,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
 // Main App Routes
 const AppRoutes: React.FC = () => {
-  const { isAuthenticated, isLoading } = useManagerAuth();
   const location = useLocation();
 
-  if (isLoading) {
-    return (
-      <Center h="100vh">
-        <Loader size="lg" />
-      </Center>
-    );
-  }
-
   // Determine which component to render based on the current path
-  if (location.pathname === '/manager-dashboard/login') {
-    return !isAuthenticated ? <SimpleManagerLogin /> : <SimpleManagerDashboard />;
-  }
-
   if (location.pathname === '/manager-dashboard/statements') {
     return (
       <ProtectedRoute>
@@ -67,11 +55,7 @@ const AppRoutes: React.FC = () => {
 
 // Manager Dashboard Wrapper Component
 const ManagerDashboardWrapper: React.FC = () => {
-  return (
-    <ManagerAuthProvider>
-      <AppRoutes />
-    </ManagerAuthProvider>
-  );
+  return <AppRoutes />;
 };
 
 export default ManagerDashboardWrapper;

@@ -24,10 +24,9 @@ import {
   IconPlus,
   IconSettings,
   IconLogout,
-  IconSwitch,
   IconAlertCircle
 } from '@tabler/icons-react';
-import { useManagerAuth } from '../../contexts/ManagerAuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { ManagerManagement } from './ManagerManagement';
 // Removed React Router dependency
 
@@ -39,7 +38,7 @@ interface DashboardStats {
 }
 
 export const SimpleManagerDashboard: React.FC = () => {
-  const { user, isAuthenticated, requiresCondoAssignment, logout, switchCondo } = useManagerAuth();
+  const { user, logout } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [showManagerManagement, setShowManagerManagement] = useState(false);
@@ -53,23 +52,21 @@ export const SimpleManagerDashboard: React.FC = () => {
   // Removed React Router navigation
 
   useEffect(() => {
-    if (user?.activeCondo) {
-      loadDashboardStats();
-    }
-  }, [user?.activeCondo]);
+    // TODO: Load dashboard stats when manager-specific data is available
+    // For now, just load basic stats
+    loadDashboardStats();
+  }, [user]);
 
   const loadDashboardStats = async () => {
-    if (!user?.activeCondo) return;
-
     setLoading(true);
     try {
       // TODO: Implement actual API calls to get dashboard stats
       // For now, using mock data
       setStats({
-        totalCondos: user.condos.length,
-        totalUnits: 10, // Mock data
-        totalStatements: 5, // Mock data
-        totalAllocations: 25 // Mock data
+        totalCondos: 0, // TODO: Get from manager API
+        totalUnits: 0,
+        totalStatements: 0,
+        totalAllocations: 0
       });
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
@@ -78,12 +75,7 @@ export const SimpleManagerDashboard: React.FC = () => {
     }
   };
 
-  const handleCondoSwitch = async (condoId: string) => {
-    if (switchCondo) {
-      await switchCondo(condoId);
-      setShowCondoSwitch(false);
-    }
-  };
+  // TODO: Implement condo switching logic with unified auth
 
   const handleCreateCondo = async () => {
     if (!createCondoForm.name || !createCondoForm.prefix) {
@@ -155,7 +147,7 @@ export const SimpleManagerDashboard: React.FC = () => {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!user) {
     return (
       <Container size="md" py="xl">
         <Alert color="blue" title="Authentication Required">
@@ -165,43 +157,8 @@ export const SimpleManagerDashboard: React.FC = () => {
     );
   }
 
-  if (requiresCondoAssignment) {
-    return (
-      <Container size="md" py="xl">
-        <Paper p="xl" radius="md" withBorder>
-          <Title order={2} mb="md">
-            No Condos Created
-          </Title>
-          <Text color="dimmed" mb="lg">
-            You haven't created any condos yet. Create your first condo to get started with managing your properties.
-          </Text>
-          <Group>
-            <Button 
-              leftSection={<IconPlus size={16} />}
-              onClick={() => setShowCreateCondo(true)}
-            >
-              Create Your First Condo
-            </Button>
-            <Button 
-              variant="outline" 
-              leftSection={<IconSettings size={16} />}
-              onClick={() => setShowManagerManagement(true)}
-            >
-              Manage Managers
-            </Button>
-            <Button 
-              variant="outline" 
-              color="red"
-              leftSection={<IconLogout size={16} />}
-              onClick={logout}
-            >
-              Logout
-            </Button>
-          </Group>
-        </Paper>
-      </Container>
-    );
-  }
+  // For now, show a simplified manager dashboard
+  // TODO: Implement manager-specific logic based on user role
 
   if (showManagerManagement) {
     return <ManagerManagement onClose={() => setShowManagerManagement(false)} />;
@@ -215,7 +172,7 @@ export const SimpleManagerDashboard: React.FC = () => {
           <div>
             <Title order={1}>Manager Dashboard</Title>
             <Text color="dimmed" size="lg">
-              Welcome back, {user?.manager.name}
+              Welcome back, {(user?.userData as any)?.email || 'Manager'}
             </Text>
           </div>
           <Button
@@ -228,47 +185,35 @@ export const SimpleManagerDashboard: React.FC = () => {
           </Button>
         </Group>
 
-        {/* Active Condo Info */}
-        {user?.activeCondo && (
-          <Paper p="md" radius="md" withBorder>
-            <Group justify="space-between">
-              <Group>
-                <IconBuilding size={24} color="var(--mantine-color-blue-6)" />
-                <div>
-                  <Text fw={500} size="lg">
-                    {user.activeCondo.name}
-                  </Text>
-                  <Text size="sm" color="dimmed">
-                    Prefix: {user.activeCondo.prefix}
-                  </Text>
-                </div>
-                <Badge color="green" variant="light">
-                  Active
-                </Badge>
-              </Group>
-              <Group gap="xs">
-                {user.condos.length > 1 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    leftSection={<IconSwitch size={16} />}
-                    onClick={() => setShowCondoSwitch(true)}
-                  >
-                    Switch Condo
-                  </Button>
-                )}
-          <Button
-            variant="outline"
-            size="sm"
-            leftSection={<IconPlus size={16} />}
-            onClick={() => setShowCreateCondo(true)}
-          >
-            Create Condo
-          </Button>
-              </Group>
+        {/* Manager Info */}
+        <Paper p="md" radius="md" withBorder>
+          <Group justify="space-between">
+            <Group>
+              <IconBuilding size={24} color="var(--mantine-color-blue-6)" />
+              <div>
+                <Text fw={500} size="lg">
+                  Manager Dashboard
+                </Text>
+                <Text size="sm" color="dimmed">
+                  Access level: Manager
+                </Text>
+              </div>
+              <Badge color="blue" variant="light">
+                Manager
+              </Badge>
             </Group>
-          </Paper>
-        )}
+            <Group gap="xs">
+              <Button
+                variant="outline"
+                size="sm"
+                leftSection={<IconPlus size={16} />}
+                onClick={() => setShowCreateCondo(true)}
+              >
+                Create Condo
+              </Button>
+            </Group>
+          </Group>
+        </Paper>
       </Stack>
 
       {/* Dashboard Stats */}
@@ -415,53 +360,9 @@ export const SimpleManagerDashboard: React.FC = () => {
             Select which condo you want to work with. This will become your active condo:
           </Text>
           
-          {user?.condos.length === 0 ? (
-            <Alert icon={<IconAlertCircle size={16} />} color="blue" variant="light">
-              <Text size="sm">No condos assigned to your account. Use "Add Condo" to request access to condos.</Text>
-            </Alert>
-          ) : (
-            <Stack gap="md">
-              {user?.condos.map((condo) => (
-                <Card 
-                  key={condo.id} 
-                  shadow="sm" 
-                  padding="md" 
-                  radius="md" 
-                  withBorder
-                  style={{ 
-                    cursor: condo.id === user.activeCondo?.id ? 'default' : 'pointer',
-                    opacity: condo.id === user.activeCondo?.id ? 0.7 : 1,
-                    borderColor: condo.id === user.activeCondo?.id ? 'var(--mantine-color-green-6)' : undefined
-                  }}
-                  onClick={() => condo.id !== user.activeCondo?.id && handleCondoSwitch(condo.id)}
-                >
-                  <Group justify="space-between">
-                    <Group>
-                      <IconBuilding size={24} color="var(--mantine-color-blue-6)" />
-                      <div>
-                        <Text fw={500} size="lg">{condo.name}</Text>
-                        <Text size="sm" color="dimmed">Prefix: {condo.prefix}</Text>
-                      </div>
-                    </Group>
-                    {condo.id === user.activeCondo?.id ? (
-                      <Badge color="green" variant="filled" size="lg">
-                        Currently Active
-                      </Badge>
-                    ) : (
-                      <Button
-                        variant="light"
-                        color="blue"
-                        size="sm"
-                        leftSection={<IconSwitch size={16} />}
-                      >
-                        Switch To
-                      </Button>
-                    )}
-                  </Group>
-                </Card>
-              ))}
-            </Stack>
-          )}
+          <Alert icon={<IconAlertCircle size={16} />} color="blue" variant="light">
+            <Text size="sm">Manager condo management will be implemented with the unified authentication system.</Text>
+          </Alert>
         </Stack>
       </Modal>
 
