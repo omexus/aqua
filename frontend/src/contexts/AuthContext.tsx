@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setError(null);
 
       try {
-        const response = await axios.post('http://localhost:5000/api/managerauth/google', {
+        const response = await axios.post('http://localhost:5001/api/managerauth/google', {
           code: codeResponse.code,
           redirectUri: 'http://localhost:5173/callback'
         });

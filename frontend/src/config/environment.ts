@@ -19,7 +19,7 @@ export interface EnvironmentConfig {
 
 // Default configuration
 const defaultConfig: EnvironmentConfig = {
-  apiBaseUrl: 'http://localhost:5000',
+  apiBaseUrl: 'http://localhost:5001',
   useMockApi: false, // Default to live API
   googleClientId: '252228382269-imsndvuvdtqfsbc4ecnf8jmf4m98p20a.apps.googleusercontent.com',
   googleRedirectUri: 'http://localhost:5173',

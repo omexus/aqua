@@ -167,7 +167,8 @@ export const requestPreSignedUrl = async (
 ): Promise<[sucess: boolean, url: PresignedUrl]> => {
   try {
     const tenantId = getTenantId();
-    const { data } = await axios.get(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.get(
       getApiEndpoint(`/statements/${tenantId}/presign/${period}/${encodeURIComponent(
         file.name
       )}`)
