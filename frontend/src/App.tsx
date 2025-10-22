@@ -12,7 +12,7 @@ import "@mantine/dates/styles.css";
 import { ModalsProvider } from "@mantine/modals";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { ApiTest } from "./components/auth/ApiTest";
-import SimpleManagerApp from "./SimpleManagerApp";
+import { ManagerDashboardWrapper } from "./components/manager/ManagerDashboardWrapper";
 
 function App() {
   return (
@@ -27,7 +27,7 @@ function App() {
                   <Route path="statements/:id" element={<Statements />}></Route>
                   <Route path="billing" element={<Billing />}></Route>
                 </Route>
-                <Route path="/manager-dashboard/*" element={<SimpleManagerApp />}></Route>
+                <Route path="/manager-dashboard/*" element={<ManagerDashboardWrapper />}></Route>
                 <Route path="/api-test" element={<ApiTest />}></Route>
                 <Route path="*" element={<NotFound />}></Route>
               </Routes>
