@@ -68,11 +68,9 @@ const AppRoutes: React.FC = () => {
 // Manager Dashboard Wrapper Component
 const ManagerDashboardWrapper: React.FC = () => {
   return (
-    <ModalsProvider>
-      <ManagerAuthProvider>
-        <AppRoutes />
-      </ManagerAuthProvider>
-    </ModalsProvider>
+    <ManagerAuthProvider>
+      <AppRoutes />
+    </ManagerAuthProvider>
   );
 };
 

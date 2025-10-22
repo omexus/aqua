@@ -26,10 +26,10 @@ function App() {
                   <Route path="statements" element={<Periods />}></Route>
                   <Route path="statements/:id" element={<Statements />}></Route>
                   <Route path="billing" element={<Billing />}></Route>
+                  <Route path="manager-dashboard" element={<ManagerDashboardWrapper />}></Route>
+                  <Route path="manager-dashboard/statements" element={<ManagerDashboardWrapper />}></Route>
+                  <Route path="manager-dashboard/login" element={<ManagerDashboardWrapper />}></Route>
                 </Route>
-                <Route path="/manager-dashboard" element={<ManagerDashboardWrapper />}></Route>
-                <Route path="/manager-dashboard/statements" element={<ManagerDashboardWrapper />}></Route>
-                <Route path="/manager-dashboard/login" element={<ManagerDashboardWrapper />}></Route>
                 <Route path="/api-test" element={<ApiTest />}></Route>
                 <Route path="*" element={<NotFound />}></Route>
               </Routes>
