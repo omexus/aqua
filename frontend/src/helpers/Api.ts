@@ -9,6 +9,30 @@ import {
 } from "../types/StatementTypes";
 import { getApiBaseUrl, isUsingMockApi, getApiEndpoint } from "../config/environment";
 
+// Helper function to get auth token from localStorage
+const getAuthToken = (): string | null => {
+  try {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      return user.token;
+    }
+  } catch (error) {
+    console.error('Error getting auth token:', error);
+  }
+  return null;
+};
+
+// Helper function to create axios instance with auth headers
+const createAuthenticatedAxios = () => {
+  const token = getAuthToken();
+  return axios.create({
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` })
+    }
+  });
+};
+
 // Mock authentication types
 export interface MockLoginRequest {
   email: string;
@@ -216,7 +240,8 @@ export const getPeriods = async (): Promise<
 > => {
   try {
     const tenantId = getTenantId();
-    const { data } = await axios.get(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.get(
       getApiEndpoint(`/periods/${tenantId}`)
     );
 
@@ -238,7 +263,8 @@ export const getStatements = async (
 ): Promise<[sucess: boolean, response: PeriodWithStatementsResponse]> => {
   try {
     const tenantId = getTenantId();
-    const { data } = await axios.get<PeriodWithStatementsResponse>(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.get<PeriodWithStatementsResponse>(
       getApiEndpoint(`/periods/${tenantId}/${periodId}/statements`)
     );
 
@@ -281,7 +307,8 @@ export const saveStatement = async (
   request: StatementSaveRequest
 ): Promise<[sucess: boolean, response: CondoResponse | null]> => {
   try {
-    const { data } = await axios.post(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.post(
       getApiEndpoint(`/statements/${id}`),
       request
     );
@@ -305,7 +332,8 @@ export const savePeriod = async (
 ): Promise<[sucess: boolean, response: PeriodResponse | null]> => {
   try {
     const url = getApiEndpoint(`/periods/${id}`);
-    const { data } = await axios.post(url, request);
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.post(url, request);
 
     if (!data) {
       const msg = "No data returned from savePeriod endpoint";
