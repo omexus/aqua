@@ -156,33 +156,7 @@ export const mockLogin = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 export const getCurrentUser = async (
   token: string
@@ -209,33 +183,7 @@ export const getCurrentUser = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 // API functions with tenant support
 export const requestPreSignedUrl = async (
@@ -292,33 +240,7 @@ export const getUnit = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 export const getUnits = async (): Promise<
   [sucess: boolean, response: UnitResponse[]]
@@ -411,33 +333,7 @@ export const getCondo = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 export const saveStatement = async (
   id: string,
@@ -464,33 +360,7 @@ export const saveStatement = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 export const savePeriod = async (
   id: string,
@@ -514,33 +384,7 @@ export const savePeriod = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 export const SendEmails = async (periodId: string, selectedRows: string[]): Promise<boolean> => {
   try {
@@ -630,33 +474,7 @@ export const authenticateWithGoogle = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 // User provisioning types
 export interface UserProvisionRequest {
@@ -732,33 +550,7 @@ export const provisionUser = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 export const getCurrentUserProfile = async (
   token: string,
@@ -785,33 +577,7 @@ export const getCurrentUserProfile = async (
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 export const getAvailableCondos = async (): Promise<[success: boolean, response: CondoOption[] | null]> => {
   try {
@@ -832,33 +598,7 @@ export const getAvailableCondos = async (): Promise<[success: boolean, response:
   }
 };
 
-export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
-  try {
-    const tenantId = getTenantId();
-    const authenticatedAxios = createAuthenticatedAxios();
-    const { data } = await authenticatedAxios.post(
-      getApiEndpoint(`/units/${tenantId}/bulk`),
-      unitsData
-    );
 
-    if (!data) {
-      console.error("No data returned from createUnits endpoint");
-    }
-
-    return [true, data];
-  } catch (err: unknown) {
-    console.error("Error in createUnits", err);
-    if (axios.isAxiosError(err)) {
-      console.error("Axios error details:", {
-        status: err.response?.status,
-        statusText: err.response?.statusText,
-        data: err.response?.data,
-        url: err.config?.url
-      });
-    }
-    return [false, null];
-  }
-};
 
 export const createCondo = async (
   request: CondoCreateRequest
@@ -889,6 +629,8 @@ export const createCondo = async (
     return [false, null];
   }
 };
+
+
 
 export const createUnits = async (unitsData: any): Promise<[success: boolean, response: any]> => {
   try {
