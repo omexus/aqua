@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Group, Code, NavLink } from "@mantine/core";
+import { useLocation } from "react-router-dom";
 import {
   // IconBellRinging,
   // IconFingerprint,
@@ -43,7 +44,22 @@ const data = [
 
 const PageNav = () => {
   const [active, setActive] = useState(0);
+  const location = useLocation();
   const { user, directGoogleLogin, profile, logout } = useAuth(); // Using AuthContext to set user
+
+  // Update active state based on current location
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const activeIndex = data.findIndex(item => {
+      if (item.link === '/manager-dashboard') {
+        return currentPath.startsWith('/manager-dashboard');
+      }
+      return currentPath === item.link;
+    });
+    if (activeIndex !== -1) {
+      setActive(activeIndex);
+    }
+  }, [location.pathname]);
 
   const links = data.map((item, index) => (
     <NavLink
