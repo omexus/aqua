@@ -1,8 +1,5 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { MantineProvider } from '@mantine/core';
-import '@mantine/core/styles.css';
-import '@mantine/dates/styles.css';
 import { ModalsProvider } from '@mantine/modals';
 import { ManagerAuthProvider, useManagerAuth } from '../../contexts/ManagerAuthContext';
 import { SimpleManagerDashboard } from './SimpleManagerDashboard';
@@ -65,14 +62,14 @@ const AppRoutes: React.FC = () => {
 };
 
 // Manager Dashboard Wrapper Component
-export const ManagerDashboardWrapper: React.FC = () => {
+const ManagerDashboardWrapper: React.FC = () => {
   return (
-    <MantineProvider>
-      <ModalsProvider>
-        <ManagerAuthProvider>
-          <AppRoutes />
-        </ManagerAuthProvider>
-      </ModalsProvider>
-    </MantineProvider>
+    <ModalsProvider>
+      <ManagerAuthProvider>
+        <AppRoutes />
+      </ManagerAuthProvider>
+    </ModalsProvider>
   );
 };
+
+export default ManagerDashboardWrapper;

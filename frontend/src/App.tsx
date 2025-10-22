@@ -12,7 +12,7 @@ import "@mantine/dates/styles.css";
 import { ModalsProvider } from "@mantine/modals";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { ApiTest } from "./components/auth/ApiTest";
-import { ManagerDashboardWrapper } from "./components/manager/ManagerDashboardWrapper";
+import ManagerDashboardWrapper from "./components/manager/ManagerDashboardWrapper.tsx";
 
 function App() {
   return (
