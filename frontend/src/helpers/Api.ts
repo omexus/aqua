@@ -99,17 +99,17 @@ export const getTenantId = (): string => {
       console.log('🔍 getTenantId - userData.userData?.activeCondo:', userData.userData?.activeCondo);
       
       // Check for manager's active condo ID
-      if (userData.userData?.activeCondo?.id) {
+      if (userData.userData?.activeCondo?.id && userData.userData.activeCondo.id !== 'undefined') {
         console.log('✅ getTenantId - using activeCondo.id:', userData.userData.activeCondo.id);
         return userData.userData.activeCondo.id;
       }
       // Fallback to legacy tenantId
-      if (userData.tenantId) {
+      if (userData.tenantId && userData.tenantId !== 'undefined') {
         console.log('✅ getTenantId - using legacy tenantId:', userData.tenantId);
         return userData.tenantId;
       }
       // Fallback to userData.tenantId
-      if (userData.userData?.tenantId) {
+      if (userData.userData?.tenantId && userData.userData.tenantId !== 'undefined') {
         console.log('✅ getTenantId - using userData.tenantId:', userData.userData.tenantId);
         return userData.userData.tenantId;
       }
