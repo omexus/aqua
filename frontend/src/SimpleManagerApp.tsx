@@ -7,6 +7,8 @@ import { ModalsProvider } from '@mantine/modals';
 import { ManagerAuthProvider, useManagerAuth } from './contexts/ManagerAuthContext';
 import { SimpleManagerDashboard } from './components/manager/SimpleManagerDashboard';
 import { SimpleManagerLogin } from './components/manager/SimpleManagerLogin';
+import { CondoAssignmentPrompt } from './components/manager/CondoAssignmentPrompt';
+import { StatementAllocation } from './components/manager/StatementAllocation';
 import { Container, Loader, Center } from '@mantine/core';
 
 // Protected Route Component
@@ -26,15 +28,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   if (requiresCondoAssignment) {
-    return (
-      <Container size="md" py="xl">
-        <div style={{ textAlign: 'center' }}>
-          <h2>No Condos Assigned</h2>
-          <p>You don't have any condos assigned to your account yet.</p>
-          <p>Please contact your administrator to get condo access.</p>
-        </div>
-      </Container>
-    );
+    return <CondoAssignmentPrompt />;
   }
 
   return <>{children}</>;
@@ -58,6 +52,11 @@ const AppRoutes: React.FC = () => {
       <Route path="/" element={
         <ProtectedRoute>
           <SimpleManagerDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/statements" element={
+        <ProtectedRoute>
+          <StatementAllocation />
         </ProtectedRoute>
       } />
       <Route path="*" element={<Navigate to="/" replace />} />
