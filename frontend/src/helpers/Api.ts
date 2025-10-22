@@ -24,7 +24,7 @@ const getAuthToken = (): string | null => {
 };
 
 // Helper function to create axios instance with auth headers
-const createAuthenticatedAxios = () => {
+export const createAuthenticatedAxios = () => {
   const token = getAuthToken();
   return axios.create({
     headers: {
