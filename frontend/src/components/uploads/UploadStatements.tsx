@@ -32,10 +32,30 @@ type Props = {
 };
 
 const getMappedUnits = (files: File[], unitsInDb: UnitResponse[]) => {
+  console.log('🔍 getMappedUnits - files:', files.map(f => f.name));
+  console.log('🔍 getMappedUnits - unitsInDb:', unitsInDb);
+  
   return files.map((file) => {
     const [unitId] = file.name.split("-");
     const unitIdNumber = (+unitId).toString();
+    console.log('🔍 getMappedUnits - file:', file.name, 'extracted unitId:', unitId, 'unitIdNumber:', unitIdNumber);
+    
     const u = unitsInDb.find((u) => u.unit === unitIdNumber);
+    console.log('🔍 getMappedUnits - found unit:', u);
+    
+    if (!u) {
+      console.warn('⚠️ getMappedUnits - No unit found for:', unitIdNumber, 'in units:', unitsInDb.map(u => u.unit));
+      // Return a default unit structure to prevent undefined errors
+      return {
+        id: '', // This will cause the saveStatement to fail, but at least we won't crash
+        unit: unitIdNumber,
+        userId: '',
+        name: '',
+        email: '',
+        file: file
+      } as MappedUnit;
+    }
+    
     return { ...u, file: file } as MappedUnit;
   });
 };
@@ -187,6 +207,14 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded, 
 
     //get promises for each unit with file to save request (StatementSaveRequest)
     const saveMetadaPromises = fileUnits.map((unit) => {
+      console.log('🔍 saveMetadaPromises - unit:', unit);
+      console.log('🔍 saveMetadaPromises - unit.id:', unit.id);
+      
+      if (!unit.id) {
+        console.error('❌ saveMetadaPromises - unit.id is empty/undefined for unit:', unit);
+        return Promise.resolve([false, { error: 'Unit ID is missing' }]);
+      }
+      
       return saveStatement(unit.id, {
         from: "",
         to: "",
