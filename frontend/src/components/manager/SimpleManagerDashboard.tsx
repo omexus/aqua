@@ -59,13 +59,19 @@ export const SimpleManagerDashboard: React.FC = () => {
   const loadDashboardStats = async () => {
     setLoading(true);
     try {
-      // TODO: Implement actual API calls to get dashboard stats
-      // For now, using mock data
+      // Get condo data from user context
+      const condos = (user?.userData as any)?.condos || [];
+      const activeCondo = (user?.userData as any)?.activeCondo;
+      
+      console.log('🔍 loadDashboardStats - user:', user);
+      console.log('🔍 loadDashboardStats - condos:', condos);
+      console.log('🔍 loadDashboardStats - activeCondo:', activeCondo);
+      
       setStats({
-        totalCondos: 0, // TODO: Get from manager API
-        totalUnits: 0,
-        totalStatements: 0,
-        totalAllocations: 0
+        totalCondos: condos.length,
+        totalUnits: 0, // TODO: Get from API
+        totalStatements: 0, // TODO: Get from API
+        totalAllocations: 0 // TODO: Get from API
       });
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
@@ -205,6 +211,53 @@ export const SimpleManagerDashboard: React.FC = () => {
             </Group>
           </Group>
         </Paper>
+
+        {/* Active Condo Info */}
+        {(user?.userData as any)?.activeCondo && (
+          <Paper p="md" radius="md" withBorder>
+            <Group>
+              <IconBuilding size={20} color="var(--mantine-color-green-6)" />
+              <div>
+                <Text fw={500} size="md">
+                  Active Condo: {(user?.userData as any)?.activeCondo?.name}
+                </Text>
+                <Text size="sm" color="dimmed">
+                  Prefix: {(user?.userData as any)?.activeCondo?.prefix}
+                </Text>
+              </div>
+              <Badge color="green" variant="light">
+                Active
+              </Badge>
+            </Group>
+          </Paper>
+        )}
+
+        {/* All Condos */}
+        {(user?.userData as any)?.condos && (user?.userData as any)?.condos.length > 0 && (
+          <Paper p="md" radius="md" withBorder>
+            <Text fw={500} size="md" mb="sm">
+              Managed Condos ({(user?.userData as any)?.condos.length})
+            </Text>
+            <Stack gap="xs">
+              {(user?.userData as any)?.condos.map((condo: any, index: number) => (
+                <Group key={condo.id} justify="space-between" p="xs" style={{ backgroundColor: condo.id === (user?.userData as any)?.activeCondo?.id ? 'var(--mantine-color-blue-0)' : 'transparent' }}>
+                  <Group>
+                    <IconBuilding size={16} color="var(--mantine-color-blue-6)" />
+                    <div>
+                      <Text size="sm" fw={500}>{condo.name}</Text>
+                      <Text size="xs" color="dimmed">Prefix: {condo.prefix}</Text>
+                    </div>
+                  </Group>
+                  {condo.id === (user?.userData as any)?.activeCondo?.id && (
+                    <Badge color="green" variant="light" size="sm">
+                      Active
+                    </Badge>
+                  )}
+                </Group>
+              ))}
+            </Stack>
+          </Paper>
+        )}
       </Stack>
 
       {/* Dashboard Stats */}
