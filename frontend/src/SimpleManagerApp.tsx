@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
@@ -48,18 +48,18 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={!isAuthenticated ? <SimpleManagerLogin /> : <Navigate to="/" replace />} />
-      <Route path="/" element={
+      <Route path="login" element={!isAuthenticated ? <SimpleManagerLogin /> : <Navigate to="/manager-dashboard" replace />} />
+      <Route path="" element={
         <ProtectedRoute>
           <SimpleManagerDashboard />
         </ProtectedRoute>
       } />
-      <Route path="/statements" element={
+      <Route path="statements" element={
         <ProtectedRoute>
           <StatementAllocation />
         </ProtectedRoute>
       } />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/manager-dashboard" replace />} />
     </Routes>
   );
 };
@@ -70,9 +70,7 @@ const SimpleManagerApp: React.FC = () => {
     <MantineProvider>
       <ModalsProvider>
         <ManagerAuthProvider>
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
+          <AppRoutes />
         </ManagerAuthProvider>
       </ModalsProvider>
     </MantineProvider>

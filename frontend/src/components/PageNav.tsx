@@ -11,6 +11,7 @@ import {
   // IconSwitchHorizontal,
   IconLogout,
   IconFileInvoice,
+  IconDashboard,
   // IconLogin,
 } from "@tabler/icons-react";
 // import { MantineLogo } from '@mantinex/mantine-logo';
@@ -25,6 +26,12 @@ const data = [
     label: "Recibos",
     description: "Gestión de Recibos",
     icon: IconFileInvoice,
+  },
+  {
+    link: "/manager-dashboard",
+    label: "Manager Dashboard",
+    description: "Panel de Administración",
+    icon: IconDashboard,
   },
   // { link: '/billing', label: 'Billing', icon: IconReceipt2 },
   // { link: '#3', label: 'Security', icon: IconFingerprint },
