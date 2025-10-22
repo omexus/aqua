@@ -89,14 +89,35 @@ export type CondoResponse = {
 // Helper function to get tenant ID from localStorage or default
 export const getTenantId = (): string => {
   const user = localStorage.getItem('user');
+  console.log('🔍 getTenantId - user from localStorage:', user);
+  
   if (user) {
     try {
       const userData = JSON.parse(user);
-      return userData.tenantId || "a2f02fa1-bbe4-46f8-90be-4aa43162400c"; // Default to Aqua
+      console.log('🔍 getTenantId - parsed userData:', userData);
+      console.log('🔍 getTenantId - userData.userData:', userData.userData);
+      console.log('🔍 getTenantId - userData.userData?.activeCondo:', userData.userData?.activeCondo);
+      
+      // Check for manager's active condo ID
+      if (userData.userData?.activeCondo?.id) {
+        console.log('✅ getTenantId - using activeCondo.id:', userData.userData.activeCondo.id);
+        return userData.userData.activeCondo.id;
+      }
+      // Fallback to legacy tenantId
+      if (userData.tenantId) {
+        console.log('✅ getTenantId - using legacy tenantId:', userData.tenantId);
+        return userData.tenantId;
+      }
+      // Fallback to userData.tenantId
+      if (userData.userData?.tenantId) {
+        console.log('✅ getTenantId - using userData.tenantId:', userData.userData.tenantId);
+        return userData.userData.tenantId;
+      }
     } catch (err) {
       console.error("Error parsing user data:", err);
     }
   }
+  console.log('⚠️ getTenantId - using default tenantId');
   return "a2f02fa1-bbe4-46f8-90be-4aa43162400c"; // Default to Aqua
 };
 
