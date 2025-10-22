@@ -23,6 +23,12 @@ namespace aqua.api
             // Seed multiple condos (tenants)
             await SeedCondosAsync();
 
+            // Seed managers
+            await SeedManagersAsync();
+
+            // Seed manager-condo relationships
+            await SeedManagerCondosAsync();
+
             // Seed users for each condo
             await SeedUsersAsync();
 
@@ -66,6 +72,103 @@ namespace aqua.api
             {
                 await _context.SaveAsync(condo);
                 Console.WriteLine($"🏢 Seeded Condo: {condo.Name} (ID: {condo.Id})");
+            }
+        }
+
+        private async Task SeedManagersAsync()
+        {
+            var managerId = Guid.Parse("11111111-1111-1111-1111-111111111111"); // Fixed manager ID
+            var managers = new List<Manager>
+            {
+                new Manager
+                {
+                    Id = managerId,
+                    Attribute = "MANAGER",
+                    GoogleUserId = "mock-google-id-123",
+                    Email = "hl.morales@gmail.com",
+                    Name = "Hugo Morales",
+                    Picture = "https://via.placeholder.com/150",
+                    Role = "MANAGER",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    IsEmailVerified = true,
+                    EmailVerifiedAt = DateTime.UtcNow
+                }
+            };
+
+            foreach (var manager in managers)
+            {
+                await _context.SaveAsync(manager);
+                Console.WriteLine($"👨‍💼 Seeded Manager: {manager.Name} ({manager.Email})");
+            }
+        }
+
+        private async Task SeedManagerCondosAsync()
+        {
+            // Get the manager ID (we'll use a fixed ID for consistency)
+            var managerId = Guid.Parse("11111111-1111-1111-1111-111111111111"); // Fixed manager ID
+            
+            // Get all condo IDs
+            var aquaCondoId = Guid.Parse("a2f02fa1-bbe4-46f8-90be-4aa43162400c");
+            var marinaCondoId = Guid.Parse("b3f13fa2-cce5-47f9-91cf-5bb54273511d");
+            var sunsetCondoId = Guid.Parse("c4f24fa3-ddf6-48fa-92df-6cc65384622e");
+
+            var managerCondos = new List<ManagerCondo>
+            {
+                new ManagerCondo
+                {
+                    Id = managerId,
+                    Attribute = $"MANAGERCONDO#{aquaCondoId}",
+                    ManagerId = managerId.ToString(),
+                    CondoId = aquaCondoId.ToString(),
+                    Role = "MANAGER",
+                    IsActive = true,
+                    AssignedAt = DateTime.UtcNow,
+                    CondoName = "Aqua Condominium",
+                    CondoPrefix = "AQUA",
+                    CanManageUnits = true,
+                    CanManageStatements = true,
+                    CanManagePeriods = true,
+                    CanViewReports = true
+                },
+                new ManagerCondo
+                {
+                    Id = managerId,
+                    Attribute = $"MANAGERCONDO#{marinaCondoId}",
+                    ManagerId = managerId.ToString(),
+                    CondoId = marinaCondoId.ToString(),
+                    Role = "MANAGER",
+                    IsActive = true,
+                    AssignedAt = DateTime.UtcNow,
+                    CondoName = "Marina Towers",
+                    CondoPrefix = "MARINA",
+                    CanManageUnits = true,
+                    CanManageStatements = true,
+                    CanManagePeriods = true,
+                    CanViewReports = true
+                },
+                new ManagerCondo
+                {
+                    Id = managerId,
+                    Attribute = $"MANAGERCONDO#{sunsetCondoId}",
+                    ManagerId = managerId.ToString(),
+                    CondoId = sunsetCondoId.ToString(),
+                    Role = "MANAGER",
+                    IsActive = true,
+                    AssignedAt = DateTime.UtcNow,
+                    CondoName = "Sunset Heights",
+                    CondoPrefix = "SUNSET",
+                    CanManageUnits = true,
+                    CanManageStatements = true,
+                    CanManagePeriods = true,
+                    CanViewReports = true
+                }
+            };
+
+            foreach (var managerCondo in managerCondos)
+            {
+                await _context.SaveAsync(managerCondo);
+                Console.WriteLine($"🔗 Seeded Manager-Condo: {managerCondo.CondoName} (Manager: {managerCondo.ManagerId})");
             }
         }
 

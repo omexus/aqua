@@ -55,7 +55,7 @@ namespace aqua.api.Middleware
                 }
 
                 // Check manager role
-                if (managerInfo.Role != "MANAGER")
+                if (managerInfo.Role != "Manager" && managerInfo.Role != "MANAGER")
                 {
                     _logger.LogWarning("Non-manager role {Role} attempted to access {Path}", 
                         managerInfo.Role, context.Request.Path);
@@ -129,8 +129,8 @@ namespace aqua.api.Middleware
         {
             try
             {
-                // In a real implementation, you would validate the JWT token properly
-                // For now, we'll do a simplified validation
+                // For development, we'll do a simplified validation without signature verification
+                // In production, you would validate the JWT signature properly
                 
                 var handler = new JwtSecurityTokenHandler();
                 var jsonToken = handler.ReadJwtToken(token);
@@ -147,6 +147,9 @@ namespace aqua.api.Middleware
                     _logger.LogWarning("Missing required claims in token");
                     return null;
                 }
+
+                _logger.LogInformation("Token validation successful for manager: {ManagerId}, role: {Role}", 
+                    managerIdClaim.Value, roleClaim.Value);
 
                 return new ManagerContext
                 {
