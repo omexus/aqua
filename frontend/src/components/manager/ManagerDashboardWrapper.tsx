@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { ModalsProvider } from '@mantine/modals';
 import { ManagerAuthProvider, useManagerAuth } from '../../contexts/ManagerAuthContext';
 import { SimpleManagerDashboard } from './SimpleManagerDashboard';
@@ -34,6 +34,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // Main App Routes
 const AppRoutes: React.FC = () => {
   const { isAuthenticated, isLoading } = useManagerAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -43,21 +44,24 @@ const AppRoutes: React.FC = () => {
     );
   }
 
+  // Determine which component to render based on the current path
+  if (location.pathname === '/manager-dashboard/login') {
+    return !isAuthenticated ? <SimpleManagerLogin /> : <SimpleManagerDashboard />;
+  }
+
+  if (location.pathname === '/manager-dashboard/statements') {
+    return (
+      <ProtectedRoute>
+        <StatementAllocation />
+      </ProtectedRoute>
+    );
+  }
+
+  // Default to dashboard for /manager-dashboard
   return (
-    <Routes>
-      <Route path="login" element={!isAuthenticated ? <SimpleManagerLogin /> : <Navigate to="/manager-dashboard" replace />} />
-      <Route path="" element={
-        <ProtectedRoute>
-          <SimpleManagerDashboard />
-        </ProtectedRoute>
-      } />
-      <Route path="statements" element={
-        <ProtectedRoute>
-          <StatementAllocation />
-        </ProtectedRoute>
-      } />
-      <Route path="*" element={<Navigate to="/manager-dashboard" replace />} />
-    </Routes>
+    <ProtectedRoute>
+      <SimpleManagerDashboard />
+    </ProtectedRoute>
   );
 };
 
