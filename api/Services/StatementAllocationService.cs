@@ -33,7 +33,8 @@ namespace aqua.api.Services
             Guid statementId, 
             Guid condoId, 
             string allocationMethod, 
-            string managerId)
+            string managerId,
+            Dictionary<string, double>? manualAmounts = null)
         {
             try
             {
@@ -55,7 +56,7 @@ namespace aqua.api.Services
                 }
 
                 // 3. Calculate allocations based on method
-                var allocations = CalculateAllocations(statement, units, allocationMethod);
+                var allocations = CalculateAllocations(statement, units, allocationMethod, manualAmounts);
 
                 // 4. Save allocations
                 await SaveAllocationsAsync(allocations);
@@ -187,7 +188,7 @@ namespace aqua.api.Services
             }
         }
 
-        private List<UnitAllocation> CalculateAllocations(Statement statement, List<DwellUnit> units, string allocationMethod)
+        private List<UnitAllocation> CalculateAllocations(Statement statement, List<DwellUnit> units, string allocationMethod, Dictionary<string, double>? manualAmounts = null)
         {
             var allocations = new List<UnitAllocation>();
 
@@ -201,6 +202,9 @@ namespace aqua.api.Services
                     break;
                 case "BY_UNITS":
                     allocations = CalculateUnitBasedAllocations(statement, units);
+                    break;
+                case "MANUAL":
+                    allocations = CalculateManualAllocations(statement, units, manualAmounts);
                     break;
                 default:
                     allocations = CalculateEqualAllocations(statement, units);
@@ -286,6 +290,44 @@ namespace aqua.api.Services
             return CalculateEqualAllocations(statement, units);
         }
 
+        private List<UnitAllocation> CalculateManualAllocations(Statement statement, List<DwellUnit> units, Dictionary<string, double>? manualAmounts)
+        {
+            var allocations = new List<UnitAllocation>();
+
+            if (manualAmounts == null || !manualAmounts.Any())
+            {
+                _logger.LogWarning("Manual allocation requested but no manual amounts provided");
+                return CalculateEqualAllocations(statement, units);
+            }
+
+            foreach (var unit in units)
+            {
+                var allocatedAmount = manualAmounts.ContainsKey(unit.Unit) ? manualAmounts[unit.Unit] : 0.0;
+                var percentage = statement.TotalAmount > 0 ? (allocatedAmount / statement.TotalAmount.Value) * 100 : 0;
+
+                allocations.Add(new UnitAllocation
+                {
+                    Id = Guid.NewGuid(),
+                    Attribute = $"ALLOCATION#{statement.Id}#{unit.Unit}",
+                    StatementId = statement.Id.ToString(),
+                    UnitNumber = unit.Unit,
+                    CondoId = statement.Id.ToString(),
+                    Period = statement.Period ?? "",
+                    UtilityType = statement.UtilityType ?? "",
+                    AllocatedAmount = allocatedAmount,
+                    Percentage = percentage,
+                    AllocationMethod = "MANUAL",
+                    UnitOwner = unit.Name,
+                    UnitEmail = unit.Email,
+                    SquareFootage = unit.SquareFootage,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = "SYSTEM" // TODO: Get from current manager
+                });
+            }
+
+            return allocations;
+        }
+
         private async Task SaveAllocationsAsync(List<UnitAllocation> allocations)
         {
             try
@@ -342,6 +384,7 @@ namespace aqua.api.Services
     {
         public string AllocationMethod { get; set; } = "EQUAL";
         public string? Notes { get; set; }
+        public Dictionary<string, double>? ManualAmounts { get; set; }
     }
 
     #endregion

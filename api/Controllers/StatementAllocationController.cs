@@ -42,7 +42,8 @@ namespace aqua.api.Controllers
                     statementId, 
                     condoId, 
                     request.AllocationMethod, 
-                    "CURRENT_MANAGER"); // TODO: Get from auth context
+                    "CURRENT_MANAGER", // TODO: Get from auth context
+                    request.ManualAmounts);
 
                 if (!result.Success)
                 {
