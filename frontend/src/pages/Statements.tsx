@@ -394,6 +394,7 @@ export function Statements() {
             files={Array.from(files || [])}
             setUploadInitiated={setUploadInitiated}
             setFilesUploaded={setFilesUploaded}
+            periodId={periodId || ""}
           ></UploadStatements>
         </Stack>
       )}

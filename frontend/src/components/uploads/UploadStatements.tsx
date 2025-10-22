@@ -28,6 +28,7 @@ type Props = {
   files: File[];
   setUploadInitiated: (value: boolean) => void;
   setFilesUploaded: (value: boolean) => void;
+  periodId: string;
 };
 
 const getMappedUnits = (files: File[], unitsInDb: UnitResponse[]) => {
@@ -39,11 +40,9 @@ const getMappedUnits = (files: File[], unitsInDb: UnitResponse[]) => {
   });
 };
 
-export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded }: Props) => {
+export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded, periodId }: Props) => {
   //   console.log("UploadStatements.files", files);
-
-  //   read the id from the url params
-  const { id: periodId } = useParams();
+  console.log('🔍 UploadStatements - periodId from props:', periodId);
   // const { id: condoId } = CondoContext.useCondo();
   // const [fileAdded, setFileAdded] = useState(false);
   const [unitsInDb, setUnitsInDb] = useState<UnitResponse[]>([]);
