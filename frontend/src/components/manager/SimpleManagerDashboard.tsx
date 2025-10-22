@@ -23,7 +23,6 @@ import {
   IconTrendingUp,
   IconPlus,
   IconSettings,
-  IconLogout,
   IconAlertCircle
 } from '@tabler/icons-react';
 import { useAuth } from '../../hooks/useAuth';
@@ -38,7 +37,7 @@ interface DashboardStats {
 }
 
 export const SimpleManagerDashboard: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [showManagerManagement, setShowManagerManagement] = useState(false);
@@ -175,14 +174,6 @@ export const SimpleManagerDashboard: React.FC = () => {
               Welcome back, {(user?.userData as any)?.email || 'Manager'}
             </Text>
           </div>
-          <Button
-            variant="outline"
-            color="red"
-            leftSection={<IconLogout size={16} />}
-            onClick={logout}
-          >
-            Logout
-          </Button>
         </Group>
 
         {/* Manager Info */}

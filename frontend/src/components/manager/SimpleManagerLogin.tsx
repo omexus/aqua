@@ -18,10 +18,10 @@ import {
   IconLock,
   IconBrandGoogle
 } from '@tabler/icons-react';
-import { useManagerAuth } from '../../contexts/ManagerAuthContext';
+import { useAuth } from '../../hooks/useAuth';
 
 export const SimpleManagerLogin: React.FC = () => {
-  const { googleLogin, mockLogin, isLoading, error } = useManagerAuth();
+  const { directGoogleLogin, mockLogin, isLoading, error } = useAuth();
   const [mockCredentials, setMockCredentials] = useState({
     email: 'hl.morales@gmail.com',
     password: 'password'
@@ -55,7 +55,7 @@ export const SimpleManagerLogin: React.FC = () => {
           variant="outline"
           fullWidth
           leftSection={<IconBrandGoogle size={16} />}
-          onClick={googleLogin}
+          onClick={directGoogleLogin}
           disabled={isLoading}
           mb="md"
         >

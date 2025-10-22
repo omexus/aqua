@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { SimpleManagerDashboard } from './SimpleManagerDashboard';
+import { SimpleManagerLogin } from './SimpleManagerLogin';
 import { StatementAllocation } from './StatementAllocation';
 import { Loader, Center } from '@mantine/core';
 import { useAuth } from '../../hooks/useAuth';
@@ -18,15 +19,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   if (!user) {
-    return (
-      <Center h="100vh">
-        <div>
-          <h2>Authentication Required</h2>
-          <p>Please log in to access the Manager Dashboard.</p>
-          <p>Use the Login button in the navigation menu.</p>
-        </div>
-      </Center>
-    );
+    return <SimpleManagerLogin />;
   }
 
   return <>{children}</>;
