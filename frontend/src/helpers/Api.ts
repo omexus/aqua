@@ -196,7 +196,8 @@ export const getUnit = async (
 ): Promise<[sucess: boolean, response: UnitResponse | null]> => {
   try {
     const tenantId = getTenantId();
-    const { data } = await axios.get(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.get(
       getApiEndpoint(`/units/${tenantId}/${unitId}`)
     );
 
@@ -218,7 +219,8 @@ export const getUnits = async (): Promise<
 > => {
   try {
     const tenantId = getTenantId();
-    const { data } = await axios.get(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.get(
       getApiEndpoint(`/units/${tenantId}`)
     );
 
@@ -285,7 +287,8 @@ export const getCondo = async (
   unitId: string
 ): Promise<[sucess: boolean, response: CondoResponse | null]> => {
   try {
-    const { data } = await axios.get(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.get(
       getApiEndpoint(`/condos/${unitId}`)
     );
 
@@ -537,7 +540,8 @@ export const getCurrentUserProfile = async (
 
 export const getAvailableCondos = async (): Promise<[success: boolean, response: CondoOption[] | null]> => {
   try {
-    const { data } = await axios.get(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.get(
       getApiEndpoint('/users/condos')
     );
 
@@ -557,7 +561,8 @@ export const createCondo = async (
   request: CondoCreateRequest
 ): Promise<[success: boolean, response: CondoCreateResponse | null]> => {
   try {
-    const { data } = await axios.post(
+    const authenticatedAxios = createAuthenticatedAxios();
+    const { data } = await authenticatedAxios.post(
       getApiEndpoint('/condos'),
       request
     );
