@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import {
   Table,
@@ -98,55 +98,58 @@ export const UploadStatements = ({ files, setUploadInitiated, setFilesUploaded }
     uploadForm.setFieldValue("files", units);
   }, [files, unitsInDb]);
 
-  const selectedFiles = uploadForm.getValues().files.map((file, index) => (
-    <Table.Tr key={`${file.name}${index}`}>
-      <Table.Td>
-        <TextInput
-          value={file.unit}
-          onChange={(e) => {
-            const newFiles = [...uploadForm.getValues().files];
-            newFiles[index] = { ...newFiles[index], unit: e.target.value };
-            uploadForm.setFieldValue("files", newFiles);
-          }}
-          placeholder="Ej: 101"
-          size="sm"
-        />
-      </Table.Td>
-      <Table.Td align="left">
-        <TextInput
-          value={file.name}
-          onChange={(e) => {
-            const newFiles = [...uploadForm.getValues().files];
-            newFiles[index] = { ...newFiles[index], name: e.target.value };
-            uploadForm.setFieldValue("files", newFiles);
-          }}
-          placeholder="Nombre del propietario"
-          size="sm"
-        />
-      </Table.Td>
-      <Table.Td align="left">
-        <TextInput
-          value={file.email}
-          onChange={(e) => {
-            const newFiles = [...uploadForm.getValues().files];
-            newFiles[index] = { ...newFiles[index], email: e.target.value };
-            uploadForm.setFieldValue("files", newFiles);
-          }}
-          placeholder="email@ejemplo.com"
-          size="sm"
-        />
-      </Table.Td>
-      <Table.Td align="left">{file.file?.name}</Table.Td>
-      <Table.Td>
-        <ActionIcon
-          color="red"
-          onClick={() => uploadForm.removeListItem("files", index)}
-        >
-          <IconTrash size="1rem" />
-        </ActionIcon>
-      </Table.Td>
-    </Table.Tr>
-  ));
+  const selectedFiles = useMemo(() => {
+    const files = uploadForm.getValues().files;
+    return files.map((file, index) => (
+      <Table.Tr key={`file-${index}-${file.file?.name || 'unknown'}`}>
+        <Table.Td>
+          <TextInput
+            value={file.unit}
+            onChange={(e) => {
+              const newFiles = [...files];
+              newFiles[index] = { ...newFiles[index], unit: e.target.value };
+              uploadForm.setFieldValue("files", newFiles);
+            }}
+            placeholder="Ej: 101"
+            size="sm"
+          />
+        </Table.Td>
+        <Table.Td align="left">
+          <TextInput
+            value={file.name}
+            onChange={(e) => {
+              const newFiles = [...files];
+              newFiles[index] = { ...newFiles[index], name: e.target.value };
+              uploadForm.setFieldValue("files", newFiles);
+            }}
+            placeholder="Nombre del propietario"
+            size="sm"
+          />
+        </Table.Td>
+        <Table.Td align="left">
+          <TextInput
+            value={file.email}
+            onChange={(e) => {
+              const newFiles = [...files];
+              newFiles[index] = { ...newFiles[index], email: e.target.value };
+              uploadForm.setFieldValue("files", newFiles);
+            }}
+            placeholder="email@ejemplo.com"
+            size="sm"
+          />
+        </Table.Td>
+        <Table.Td align="left">{file.file?.name}</Table.Td>
+        <Table.Td>
+          <ActionIcon
+            color="red"
+            onClick={() => uploadForm.removeListItem("files", index)}
+          >
+            <IconTrash size="1rem" />
+          </ActionIcon>
+        </Table.Td>
+      </Table.Tr>
+    ));
+  }, [uploadForm.values.files]);
 
   const handleOnDrop = async (files: File[]) => {
     try {
