@@ -14,7 +14,6 @@ import {
   Stack,
   Divider,
   Modal,
-  Center,
   TextInput
 } from '@mantine/core';
 import {
@@ -30,7 +29,7 @@ import {
 } from '@tabler/icons-react';
 import { useManagerAuth } from '../../contexts/ManagerAuthContext';
 import { ManagerManagement } from './ManagerManagement';
-import { useNavigate } from 'react-router-dom';
+// Removed React Router dependency
 
 interface DashboardStats {
   totalCondos: number;
@@ -51,7 +50,7 @@ export const SimpleManagerDashboard: React.FC = () => {
     prefix: ''
   });
   const [creatingCondo, setCreatingCondo] = useState(false);
-  const navigate = useNavigate();
+  // Removed React Router navigation
 
   useEffect(() => {
     if (user?.activeCondo) {
@@ -137,7 +136,7 @@ export const SimpleManagerDashboard: React.FC = () => {
   const handleQuickAction = (action: string) => {
     switch (action) {
       case 'statements':
-        navigate('/manager-dashboard/statements');
+        window.location.href = '/manager-dashboard/statements';
         break;
       case 'units':
         // TODO: Navigate to units page when created
@@ -247,7 +246,7 @@ export const SimpleManagerDashboard: React.FC = () => {
                   Active
                 </Badge>
               </Group>
-              <Group spacing="xs">
+              <Group gap="xs">
                 {user.condos.length > 1 && (
                   <Button
                     variant="outline"

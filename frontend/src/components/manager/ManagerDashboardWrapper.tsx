@@ -21,7 +21,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/manager-dashboard/login" replace />;
+    return <SimpleManagerLogin />;
   }
 
   if (requiresCondoAssignment) {
