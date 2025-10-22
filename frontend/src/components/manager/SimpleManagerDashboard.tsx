@@ -137,7 +137,7 @@ export const SimpleManagerDashboard: React.FC = () => {
   const handleQuickAction = (action: string) => {
     switch (action) {
       case 'statements':
-        navigate('/statements');
+        navigate('/manager-dashboard/statements');
         break;
       case 'units':
         // TODO: Navigate to units page when created
